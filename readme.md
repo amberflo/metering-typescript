@@ -21,6 +21,9 @@ Sample ingestion code
 ---------------------
 
 ```sh
+import { IngestOptions } from "./ingestOptions";
+import { Metering } from "./metering";
+
 export async function runIngest(){
     let apiKey = ''; //obtain your Amberflo API Key 
     let ingestOptions = new IngestOptions();
@@ -56,6 +59,9 @@ Sample usage code
 -----------------
 
 ```sh
+import { UsageClient } from "./usageClient";
+import { UsagePayload } from "./usagePayload";
+
 export async function runUsage(){
     let apiKey = ''; //obtain your Amberflo API Key 
     let payload = new UsagePayload();
