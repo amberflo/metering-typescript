@@ -1,14 +1,13 @@
 
-Download and Install
---------------------
+# Download and Install
+
 ```sh
 npm install amberflo-metering-typescript
 ```
 
-Sample ingestion code
----------------------
+# Sample ingestion code
 
-```sh
+```typescript
 import { IngestOptions, Metering } from "amberflo-metering-typescript";
 
 export async function runIngest(){
@@ -50,10 +49,9 @@ export async function runIngest(){
 runIngest()
 ```
 
-Sample usage code
------------------
+# Sample usage code
 
-```sh
+```typescript
 import { UsageClient, UsagePayload } from "amberflo-metering-typescript";
 
 export async function runUsage(){
