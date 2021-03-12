@@ -12,6 +12,7 @@ export class UsageClient {
         this.apiKey = apiKey;
         this.axiosInstance = axios.create({
             baseURL: 'https://app.amberflo.io',
+            responseType: 'json',
             headers: {
                 "X-API-KEY": this.apiKey,
                 "Content-Type": "application/json"
@@ -31,17 +32,15 @@ export class UsageClient {
             console.log(this.signature, 'calling Usage API', body);
             let response = await this.axiosInstance.post('/usage-endpoint', body);
             console.log(this.signature, 'obtained result from Usage API', response.status);
-
-            let result = response.data.map((u: { tenant: string; measure_name: string; date: Date; operation_value: number; }) => {
+            let result = new Array<UsageResult>();
+            for(let item of response.data[0]){
                 let usageResult = new UsageResult();
-                usageResult.customer = u.tenant;
-                usageResult.meterName = u.measure_name;
-                usageResult.date = u.date;
-                usageResult.operationValue = u.operation_value;
-                return usageResult;
-            });
-
-            console.log(response.data);
+                usageResult.customerName = item.tenant;
+                usageResult.meterName = item.measure_name;
+                usageResult.date = item.date;
+                usageResult.operationValue = item.operation_value;
+                result.push(usageResult);
+            }
 
             return result;
         }

@@ -1,5 +1,5 @@
 export class UsageResult {
-    customer!: string;
+    customerName!: string;
     meterName!: string;
     date!: Date;
     operationValue!: number;

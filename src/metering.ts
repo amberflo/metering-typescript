@@ -6,8 +6,10 @@ export class Metering {
     apiKey!: string;
     debug!: boolean;    
     ingestClient: IngestClient;
+    signature:string;
 
     constructor(apiKey:string, debug:boolean, ingestOptions: IngestOptions) {
+        this.signature = '[amberflo-metering Metering]:';
         this.apiKey = apiKey;
         this.debug = debug;
         this.ingestClient = new IngestClient(apiKey, ingestOptions);
@@ -19,12 +21,12 @@ export class Metering {
     }
 
     flush() {        
-        console.log('flushing');
+        console.log(this.signature, 'flushing ...');
         this.ingestClient.flush();
     }
 
-    shutdown() {        
-        console.log('shutting down');  
+    shutdown() {                
+        console.log(this.signature, 'shutting down ...');  
         this.ingestClient.shutdown();      
     }
 }

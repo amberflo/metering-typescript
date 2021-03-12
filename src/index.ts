@@ -3,6 +3,8 @@ import { Metering } from "./metering";
 import { UsageClient } from "./usageClient";
 import { UsagePayload } from "./usagePayload";
 
+const apiKey ='e9c6a4fc-e275-4eda-b2f8-353ef196ddb7';
+
 //TODO:
 // package 
 export async function runIngest(){
@@ -10,7 +12,7 @@ export async function runIngest(){
     ingestOptions.batchSize = 20;
     ingestOptions.frequencyMillis = 3000;
 
-    const metering = new Metering("e9c6a4fc-e275-4eda-b2f8-353ef196ddb7", false, ingestOptions);    
+    const metering = new Metering(apiKey, false, ingestOptions);    
 
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
@@ -35,11 +37,11 @@ export async function runIngest(){
 export async function runUsage(){
     let payload = new UsagePayload();
     payload.meterId = 'cfe68e90-82bf-11eb-902f-f9afe0dc6e9e';
-    const client = new UsageClient('e9c6a4fc-e275-4eda-b2f8-353ef196ddb7');    
+    payload.customerName = 'Dell';
+    const client = new UsageClient(apiKey);    
     let result = await client.getUsage(payload);
     console.log(result);
 }
-
 
 runIngest();
 // runUsage();
