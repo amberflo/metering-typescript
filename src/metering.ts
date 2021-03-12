@@ -20,7 +20,7 @@ export class Metering {
 
     flush() {        
         console.log('flushing');
-        this.ingestClient.shutdown();
+        this.ingestClient.flush();
     }
 
     shutdown() {        

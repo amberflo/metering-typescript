@@ -39,7 +39,7 @@ export class IngestClient {
         });
 
         console.log(this.signature, 'starting the timer to run at ms: ', this.frequencyMillis);
-        this.timer = setTimeout(this.flushTimer.bind(this), this.frequencyMillis);
+        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
     }
 
     ingestMeter(meter: MeterMessage) {
@@ -72,7 +72,7 @@ export class IngestClient {
     }
 
     dequeue() {
-        console.log(this.signature, 'flushing the queue');
+        console.log(this.signature, 'dequeuing ...');
         if (this.queue.length < 1) {
             console.log(this.signature, 'no records in the queue to flush');
             return;
@@ -80,7 +80,6 @@ export class IngestClient {
 
         let snapshot = this.queue.splice(0, this.queue.length);
         let iteration = 0;
-        let localPromises = [];
         while (snapshot.length > 0) {
             console.log(this.signature, 'call ingest API, iteration: ', iteration++);
             const items = snapshot.splice(0, this.batchSize);
@@ -103,17 +102,16 @@ export class IngestClient {
                 })
                 .catch((error) => {
                     console.log(`${this.signature},call to Ingest API failed ${error}`);
+                    this.done(requestId);
                 });
             this.promises.set(requestId, promise);
-            localPromises.push(promise);
         }
-        return localPromises;
     }
 
-    flushTimer() {
+    dequeueTimer() {
         //re-schedule         
         clearTimeout(this.timer);
-        this.timer = setTimeout(this.flushTimer.bind(this), this.frequencyMillis);
+        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
         this.dequeue();
     }
 
@@ -131,7 +129,7 @@ export class IngestClient {
     }
 
     shutdown() {
-        console.log(this.signature, 'shutting down client');
+        console.log(this.signature, 'shutting down the client');
         clearTimeout(this.timer);
         this.flush();
     }
