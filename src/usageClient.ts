@@ -8,9 +8,9 @@ export class UsageClient {
     signature: string;
 
     /**
-    * Initialize a new `UsageClient` with API key
-    * @param {string} apiKey
-    */
+     * Initialize a new `UsageClient` with API key
+     * @param {string} apiKey 
+     */
     constructor(apiKey: string) {
         this.signature = '[amberflo-metering UsageClient]:';
         this.apiKey = apiKey;
@@ -26,11 +26,10 @@ export class UsageClient {
     }
 
     /**
-    * Get usage data
-    *
-    * @param {UsagePayload} payload
-    * @returns {Promise<UsageResult[]>}
-    */
+     * Get usage data
+     * @param {UsagePayload} payload 
+     * @returns {Promise<UsageResult[]>}
+     */
     async getUsage(payload: UsagePayload): Promise<UsageResult[]> {
         let body = {
             meter_id: payload.meterId,

@@ -5,8 +5,6 @@ import { UsagePayload } from "./usagePayload";
 
 const apiKey ='e9c6a4fc-e275-4eda-b2f8-353ef196ddb7';
 
-//TODO:
-// package 
 export async function runIngest(){
     let ingestOptions = new IngestOptions();
     ingestOptions.batchSize = 20;
@@ -28,8 +26,7 @@ export async function runIngest(){
         metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
     }
 
-    //metering.flush();
-    console.log('calling shutdown');
+    //blocking calls
     metering.flush();
     metering.shutdown();    
 }
