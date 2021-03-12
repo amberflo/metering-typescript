@@ -1,36 +1,26 @@
 
-Instructions to run locally
----------------------------
-
-1. Install dependencies
+Download and Install
+--------------------
 ```sh
-npm install
-```
-
-2. Build TypeScript package
-```sh
-npx tsc 
-```
-
-3. Run project
-```sh
-node ./dist/index.js 
+npm install amberflo-metering-typescript
 ```
 
 Sample ingestion code
 ---------------------
 
 ```sh
-import { IngestOptions } from "./ingestOptions";
-import { Metering } from "./metering";
+import { IngestOptions, Metering } from "amberflo-metering-typescript";
 
 export async function runIngest(){
-    let apiKey = ''; //obtain your Amberflo API Key 
+    //obtain your Amberflo API Key 
+    let apiKey = ''; 
 
     //optional ingest options
     let ingestOptions = new IngestOptions();
-    ingestOptions.batchSize = 20; //Number of messages posted to the API. Default is 100. 
-    ingestOptions.frequencyMillis = 3000; //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
+    //Number of messages posted to the API. Default is 100.
+    ingestOptions.batchSize = 20;  
+    //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
+    ingestOptions.frequencyMillis = 3000; 
 
     const metering = new Metering(apiKey, false, ingestOptions);    
 
@@ -64,16 +54,24 @@ Sample usage code
 -----------------
 
 ```sh
-import { UsageClient } from "./usageClient";
-import { UsagePayload } from "./usagePayload";
+import { UsageClient, UsagePayload } from "amberflo-metering-typescript";
 
 export async function runUsage(){
-    let apiKey = ''; //obtain your Amberflo API Key 
+    //TODO: obtain your Amberflo API Key 
+    let apiKey = ''; 
+
+    //prepare your query payload
+    //you can filter the usage by meter and customer. 
     let payload = new UsagePayload();
-    payload.meterId = 'cfe68e90-82bf-11eb-902f-f9afe0dc6e9e';
+
+    //TODO: obtain your Amberflo meter id 
+    payload.meterId = 'my-meter-id';
     payload.customerName = 'Dell';
+
+    //initialize the usage client 
     const client = new UsageClient(apiKey);    
-    //get usage metering data
+
+    //get usage metering data with the query params
     let result = await client.getUsage(payload);
     console.log(result);
 }
