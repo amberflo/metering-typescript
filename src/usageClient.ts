@@ -7,6 +7,10 @@ export class UsageClient {
     axiosInstance: AxiosInstance;
     signature: string;
 
+    /**
+    * Initialize a new `UsageClient` with API key
+    * @param {string} apiKey
+    */
     constructor(apiKey: string) {
         this.signature = '[amberflo-metering UsageClient]:';
         this.apiKey = apiKey;
@@ -21,8 +25,13 @@ export class UsageClient {
         });
     }
 
-
-    async getUsage(payload: UsagePayload):Promise<UsageResult[]> {
+    /**
+    * Get usage data
+    *
+    * @param {UsagePayload} payload
+    * @returns {Promise<UsageResult[]>}
+    */
+    async getUsage(payload: UsagePayload): Promise<UsageResult[]> {
         let body = {
             meter_id: payload.meterId,
             tenant: payload.customerName
@@ -33,7 +42,7 @@ export class UsageClient {
             let response = await this.axiosInstance.post('/usage-endpoint', body);
             console.log(this.signature, 'obtained result from Usage API', response.status);
             let result = new Array<UsageResult>();
-            for(let item of response.data[0]){
+            for (let item of response.data[0]) {
                 let usageResult = new UsageResult();
                 usageResult.customerName = item.tenant;
                 usageResult.meterName = item.measure_name;

@@ -26,12 +26,15 @@ import { Metering } from "./metering";
 
 export async function runIngest(){
     let apiKey = ''; //obtain your Amberflo API Key 
+
+    //optional ingest options
     let ingestOptions = new IngestOptions();
-    ingestOptions.batchSize = 20;
-    ingestOptions.frequencyMillis = 3000;
+    ingestOptions.batchSize = 20; //Number of messages posted to the API. Default is 100. 
+    ingestOptions.frequencyMillis = 3000; //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
 
     const metering = new Metering(apiKey, false, ingestOptions);    
 
+    //define dimesions for your meters
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
     dimensions.set("tenant_type", "Tech");
@@ -42,6 +45,7 @@ export async function runIngest(){
         await delay;
         //Asynchronous calls
         //ingest meter values
+        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
