@@ -22,6 +22,7 @@ Sample ingestion code
 
 ```sh
 export async function runIngest(){
+    let apiKey = ''; //obtain your Amberflo API Key 
     let ingestOptions = new IngestOptions();
     ingestOptions.batchSize = 20;
     ingestOptions.frequencyMillis = 3000;
@@ -56,6 +57,7 @@ Sample usage code
 
 ```sh
 export async function runUsage(){
+    let apiKey = ''; //obtain your Amberflo API Key 
     let payload = new UsagePayload();
     payload.meterId = 'cfe68e90-82bf-11eb-902f-f9afe0dc6e9e';
     payload.customerName = 'Dell';
