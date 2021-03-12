@@ -53,7 +53,6 @@ export async function runIngest(){
     }
 
     //Synchronous calls
-    console.log('calling shutdown');
     metering.flush();
     metering.shutdown();    
 }
