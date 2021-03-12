@@ -1,8 +1,10 @@
 {
-  "name": "metering-typescript",
+  "name": "amberflo-metering-typescript",
   "version": "1.0.0",
-  "description": "Metering client for TypeScript",
-  "main": "index.js",
+  "description": "Amberflo metering client for TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "prepublish": "tsc",
   "scripts": {
     "test": "echo tests run"
   },
