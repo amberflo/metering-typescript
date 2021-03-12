@@ -40,13 +40,15 @@ export async function runIngest(){
     for(j=0; j<50; j++){
         let delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
+        //Asynchronous calls
+        //ingest meter values
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
         metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
     }
 
-    //metering.flush();
+    //Synchronous calls
     console.log('calling shutdown');
     metering.flush();
     metering.shutdown();    
@@ -68,6 +70,7 @@ export async function runUsage(){
     payload.meterId = 'cfe68e90-82bf-11eb-902f-f9afe0dc6e9e';
     payload.customerName = 'Dell';
     const client = new UsageClient(apiKey);    
+    //get usage metering data
     let result = await client.getUsage(payload);
     console.log(result);
 }
