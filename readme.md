@@ -4,7 +4,7 @@
 ```sh
 npm install amberflo-metering-typescript
 ```
-Download link: https://www.npmjs.com/package/amberflo-metering-typescript
+Package homepage: https://www.npmjs.com/package/amberflo-metering-typescript
 
 # Sample ingestion code
 
