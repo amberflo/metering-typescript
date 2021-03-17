@@ -1,18 +1,22 @@
+import { stringify } from "uuid";
+
 export class MeterMessage {
     meterName: string;
     meterValue: number;
     utcTimeMillis: number;
     customerId: string;
     customerName: string;
-    dimensions: Map<string, string>;
+    dimensions!: Map<string, string>;
 
-    constructor(meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>) {
+    constructor(meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions?: Map<string, string>) {
         this.meterName = meterName;
         this.meterValue = meterValue;
         this.utcTimeMillis = utcTimeMillis;
         this.customerId = customerId;
         this.customerName = customerName;
-        this.dimensions = dimensions;
+        if(dimensions){
+            this.dimensions = dimensions;
+        }
         console.log('meter message:', this.meterName, this.meterValue, this.utcTimeMillis, this.customerId, this.customerName, this.dimensions);
     }
 }

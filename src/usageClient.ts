@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
-import { UsagePayload } from "./usagePayload";
-import { UsageResult } from "./usageResult";
+import { UsagePayload } from "./model/usagePayload";
+import { UsageResult } from "./model/usageResult";
 
 export class UsageClient {
     apiKey: string;

@@ -1,45 +1,41 @@
-import { MeterMessage } from "./meterMessage";
-import axios, { AxiosInstance } from 'axios';
-import axiosRetry from 'axios-retry';
-import { IngestOptions } from "./ingestOptions";
+import { MeterMessage } from "../model/meterMessage";
+import { IngestOptions } from "../model/ingestOptions";
+import { IngestClient } from "./ingestClient";
+import { IngestHelper } from "./ingestHelper";
+import { IngestApiClient } from "./ingestApiClient";
+
 import { v4 as uuidv4 } from 'uuid';
 
-export class IngestClient {
+export class AsyncIngestClient implements IngestClient {
     apiKey: string;
     queue: Array<MeterMessage>;
-    axiosInstance: AxiosInstance;
     batchSize: number;
     frequencyMillis: number;
-    timer!: number;
+    timer!: ReturnType<typeof setTimeout>;
     signature: string;
     promises: Map<string, Promise<void>>;
+    apiClient!: IngestApiClient;
 
-    constructor(apiKey: string, ingestOptions: IngestOptions) {
+    constructor(apiKey: string, ingestOptions?: IngestOptions) {
         this.apiKey = apiKey;
         this.queue = [];
         this.promises = new Map<string, Promise<void>>();
-        this.axiosInstance = axios.create({
-            baseURL: 'https://app.amberflo.io',
-            headers: {
-                "X-API-KEY": this.apiKey,
-                "Content-Type": "application/json"
-            },
-            timeout: 30000
-        });
-
+       
         //options
-        let options = ingestOptions || {};
+        let options = ingestOptions || new IngestOptions();
         this.batchSize = (options.batchSize) ? Math.max(options.batchSize, 1) : 100;
-        this.frequencyMillis = (options.frequencyMillis) ? Math.max(options.frequencyMillis, 1) : 1000;
+        this.frequencyMillis = (options.frequencyMillis) ? Math.max(options.frequencyMillis, 1) : 1000;        
+        this.signature = '[amberflo-metering AsyncIngestClient]:';        
+    }
 
-        this.signature = '[amberflo-metering IngestClient]:';
-        axiosRetry(this.axiosInstance, {
-            retries: 3,
-            retryDelay: axiosRetry.exponentialDelay
-        });
+    start(): void {
+        console.log(this.signature, 'calling start ...');
+        this.apiClient = new IngestApiClient(this.apiKey);
+
+        console.log(`${this.signature} batch size: ${this.batchSize}`);
 
         console.log(this.signature, 'starting the timer to run at ms: ', this.frequencyMillis);
-        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
+        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);        
     }
 
     ingestMeter(meter: MeterMessage) {
@@ -50,20 +46,6 @@ export class IngestClient {
             console.log(this.signature, 'queue exceeded batch size, so flushing before timer');
             this.dequeue();
         }
-    }
-
-    transformMessagesToPayload(items: Array<MeterMessage>) {
-        let body = items.map((m) => {
-            return {
-                tenant: m.customerName,
-                tenant_id: m.customerId,
-                meter_name: m.meterName,
-                meter_value: m.meterValue,
-                time: m.utcTimeMillis,
-                dimensions: m.dimensions
-            }
-        });
-        return body;
     }
 
     done(requestId: string) {
@@ -85,25 +67,13 @@ export class IngestClient {
             const items = snapshot.splice(0, this.batchSize);
             console.log(this.signature, 'spliced items:', items);
 
-            let body = this.transformMessagesToPayload(items);
+            let body = IngestHelper.transformMessagesToPayload(items);
             console.log(this.signature, 'body', body);
 
             //make asynchronous call        
             let requestId = uuidv4();
             console.log(this.signature, 'starting request', requestId);
-            let promise = this.axiosInstance
-                .post('/ingest-endpoint', body)
-                .then((response) => {
-                    console.log(this.signature, "response from Ingest API: ", response.status, response.data);
-                    if (response.status >= 300) {
-                        console.log(`${this.signature} call to Ingest API failed ${response.status}, ${response.data}`);
-                    }
-                    this.done(requestId);
-                })
-                .catch((error) => {
-                    console.log(`${this.signature},call to Ingest API failed ${error}`);
-                    this.done(requestId);
-                });
+            let promise = this.apiClient.post(body, requestId, this.done);
             this.promises.set(requestId, promise);
         }
     }
@@ -115,17 +85,18 @@ export class IngestClient {
         this.dequeue();
     }
 
-    flush() {
+    async flush() {
         this.dequeue();
         console.log(this.signature, 'waiting for all requests to complete');
-        Promise
+        let promiseAll = Promise
             .all(this.promises.values())
             .then(values => {
                 console.log('all promises completed');
             })
             .catch(error => {
                 console.log('waiting for all promises errored', error)
-            });        
+            });
+        await promiseAll;        
     }
 
     shutdown() {
