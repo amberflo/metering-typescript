@@ -28,7 +28,7 @@ export class AsyncIngestClient implements IngestClient {
         this.signature = '[amberflo-metering AsyncIngestClient]:';        
     }
 
-    start(): void {
+    public start(): void {
         console.log(this.signature, 'calling start ...');
         this.apiClient = new IngestApiClient(this.apiKey);
 

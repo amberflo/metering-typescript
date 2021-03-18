@@ -5,10 +5,11 @@ import { IngestOptions } from "./model/ingestOptions";
 import * as Errors from './model/errors';
 
 export class Metering {
-    apiKey!: string;
-    debug!: boolean;
-    ingestClient: IngestClient;
-    signature: string;
+    readonly apiKey!: string;
+    readonly debug!: boolean;
+    readonly ingestClient: IngestClient;
+    private signature: string;
+    private isStarted: boolean = false;
 
     /**
      * Initialize a new metering client
@@ -26,6 +27,11 @@ export class Metering {
         this.ingestClient = IngestClientFactory.getNewInstance(apiKey, ingestOptions);
     }
 
+    start(){
+        this.ingestClient.start();
+        this.isStarted = true;
+    }
+
     /**
      * Ingest a meter
      * @param {string} meterName 
@@ -36,6 +42,9 @@ export class Metering {
      * @param {Map<string,string>} dimensions 
      */
     meter(meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions?: Map<string, string>) {
+        if(!this.isStarted){
+            throw new Error(Errors.START_NOT_CALLED);
+        }
         let meterMessage = new MeterMessage(meterName, meterValue, utcTimeMillis, customerId, customerName, dimensions);
         let validations = Metering.validateMeterMessage(meterMessage);
         if (validations.length > 0) {
