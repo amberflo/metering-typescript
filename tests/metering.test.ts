@@ -3,7 +3,6 @@ import { Metering } from "../src/metering";
 import { IngestOptions } from "../src/model/ingestOptions";
 import * as Errors from '../src/model/errors';
 import { SyncIngestClient } from "../src/ingestClient/syncIngestClient";
-import { MeterMessage } from "../src/model/meterMessage";
 
 describe('Metering tests', () => {
     afterEach(()=>{
@@ -54,11 +53,14 @@ describe('Metering tests', () => {
         let apiKey = '';
         expect(() => { new Metering(apiKey, false) }).toThrow(Errors.MISSING_API_KEY);
     });
-    test('when ingesting meter without start should get an error', () => {   
+    test('when calling any method without start() should throw an error', () => {   
         let apiKey = 'my-key';
         let debug = false;
         const metering = new Metering(apiKey, debug);     
         expect(() => { metering.meter('', 0, 0, '', '') }).toThrowError(Errors.START_NOT_CALLED);
+        expect(() => { metering.addOrUpdateCustomerDetails('', '') }).toThrowError(Errors.START_NOT_CALLED);
+        expect(() => { metering.flush() }).toThrowError(Errors.START_NOT_CALLED);
+        expect(() => { metering.shutdown() }).toThrowError(Errors.START_NOT_CALLED);
     });
     test('when ingesting meter then perform validations', () => {
         let apiKey = 'my-key';
@@ -90,5 +92,18 @@ describe('Metering tests', () => {
         let futureDate = Date.now() + (30 * 24 * 12 * 60 * 60 * 1000);
         let errorMessage2 = `Invalid meter message: ${Errors.UTC_TIME_MILLIS_FROM_FUTURE}` ;
         expect(() => { metering.meter('my-meter', 0, futureDate, 'customer-id', 'customer') }).toThrowError(errorMessage2);
+    });
+    test('when creating customer details then perform validations', () => {
+        let apiKey = 'my-key';
+        let debug = false;
+        let errorMessage = 'Invalid customer message: customerId is a required field,customerName is a required field';
+        const metering = new Metering(apiKey, debug);
+        
+        jest.spyOn(metering.ingestClient, 'start');
+        const mockedStart = metering.ingestClient.start as jest.MockedFunction<()=>void>;
+
+        metering.start();
+        expect(mockedStart).toBeCalledTimes(1);
+        expect(() => { metering.addOrUpdateCustomerDetails('', '') }).toThrowError(errorMessage);
     });
 });

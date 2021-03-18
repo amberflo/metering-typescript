@@ -26,14 +26,15 @@ export class UsageClient {
     }
 
     /**
-     * Get usage data
+     * Get usage data. This is a blocking synchronous call
      * @param {UsagePayload} payload 
      * @returns {Promise<UsageResult[]>}
      */
     async getUsage(payload: UsagePayload): Promise<UsageResult[]> {
         let body = {
             meter_id: payload.meterId,
-            tenant: payload.customerName
+            tenant: payload.customerName,
+            meter_name: payload.meterName
         };
 
         try {
