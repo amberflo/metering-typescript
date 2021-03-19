@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
 import * as Constants from '../model/constants';
 import { CustomerDetailsApiPayload } from './customerApiPayload';
@@ -7,17 +7,12 @@ import * as Errors from '../model/errors';
 export class CustomerDetailsApiClient {
     axiosInstance: AxiosInstance;
     signature: string;
+    apiKey: string;
 
     constructor(apiKey: string) {
+        this.apiKey = apiKey;
         this.signature = '[amberflo-metering CustomerDetailsApiClient]:';
-        this.axiosInstance = axios.create({
-            baseURL: Constants.amberfloBaseUrl,
-            headers: {
-                "X-API-KEY": apiKey,
-                "Content-Type": "application/json"
-            },
-            timeout: 30000
-        });
+        this.axiosInstance = axios.create();
         axiosRetry(this.axiosInstance, {
             retries: 3,
             retryDelay: axiosRetry.exponentialDelay
@@ -26,8 +21,35 @@ export class CustomerDetailsApiClient {
 
     async post(payload: CustomerDetailsApiPayload) {
         console.log(this.signature, 'calling CustomerDetails API');
-        let promise = this.axiosInstance
-            .post('/customerDetails-endpoint', payload)
+
+        const configGet: AxiosRequestConfig = {
+            url: '/customer-details-endpoint'+ payload.customerId,
+            method: 'get',
+            baseURL: Constants.amberfloBaseUrl,
+            headers: {
+                "X-API-KEY": this.apiKey,
+                "Content-Type": "application/json"
+            },
+            timeout: 30000
+        };
+
+        let resultGet = await this.axiosInstance.request(configGet);
+        const httpMethod = (Object.keys(resultGet.data).length > 0) ? 'put': 'post';
+        console.log(this.signature, 'http method is:', httpMethod);
+
+        const config: AxiosRequestConfig = {
+            url: '/customer-details-endpoint',
+            method: httpMethod,
+            baseURL: Constants.amberfloBaseUrl,
+            headers: {
+                "X-API-KEY": this.apiKey,
+                "Content-Type": "application/json"
+            },
+            timeout: 30000,
+            data: payload
+        };
+
+        let promise = this.axiosInstance.request(config)
             .then((response) => {
                 console.log("response from CustomerDetails API: ", response.status, response.data);
                 if (response.status >= 300) {
