@@ -3,7 +3,7 @@ import { IngestClient } from "./ingestClient/ingestClient";
 import { IngestClientFactory } from "./ingestClient/ingestClientFactory";
 import { IngestOptions } from "./model/ingestOptions";
 import * as Errors from './model/errors';
-import { CustomerDetailsApiPayload } from "./ingestClient/customerApiPayload";
+import { CustomerDetailsApiPayload } from "./model/customerApiPayload";
 import { CustomerDetailsApiClient } from "./ingestClient/customerDetailsApiClient";
 
 /**

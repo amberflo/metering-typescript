@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
 import * as Constants from '../model/constants';
-import { CustomerDetailsApiPayload } from './customerApiPayload';
+import { CustomerDetailsApiPayload } from '../model/customerApiPayload';
 import * as Errors from '../model/errors';
 
 export class CustomerDetailsApiClient {
