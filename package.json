@@ -2,6 +2,7 @@
   "name": "amberflo-metering-typescript",
   "version": "1.0.0",
   "description": "Amberflo metering client for TypeScript",
+  "keywords": ["Amberflo", "TypeScript", "Cloud Metering"],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "prepublish": "tsc",
