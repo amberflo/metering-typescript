@@ -4,7 +4,7 @@ import { IngestClientFactory } from "./ingestClient/ingestClientFactory";
 import { IngestOptions } from "./model/ingestOptions";
 import * as Errors from './model/errors';
 import { CustomerDetailsApiPayload } from "./model/customerApiPayload";
-import { CustomerDetailsApiClient } from "./ingestClient/CustomerDetailsApiClient";
+import { CustomerDetailsApiClient } from "./ingestClient/customerDetailsApiClient";
 
 /**
  * Metering is the main class to ingest meters into Amberflo
