@@ -17,6 +17,5 @@ export class MeterMessage {
         if(dimensions){
             this.dimensions = dimensions;
         }
-        console.log('meter message:', this.meterName, this.meterValue, this.utcTimeMillis, this.customerId, this.customerName, this.dimensions);
     }
 }

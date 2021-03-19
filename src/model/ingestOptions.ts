@@ -1,6 +1,7 @@
+import { FlushMode } from "./flushMode";
 
 export class IngestOptions{
     batchSize!: number;
     frequencyMillis!: number;
-    isAsynch: boolean = true;
+    flushMode: FlushMode = FlushMode.auto;
 }

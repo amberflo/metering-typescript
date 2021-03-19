@@ -4,8 +4,11 @@ import { IngestClientFactory } from "./ingestClient/ingestClientFactory";
 import { IngestOptions } from "./model/ingestOptions";
 import * as Errors from './model/errors';
 import { CustomerDetailsApiPayload } from "./ingestClient/customerApiPayload";
-import { CustomerDetailsApiClient } from "./ingestClient/CustomerDetailsApiClient";
+import { CustomerDetailsApiClient } from "./ingestClient/customerDetailsApiClient";
 
+/**
+ * Metering is the main class to ingest meters into Amberflo
+ */
 export class Metering {
     readonly customerDetailsApiClient: CustomerDetailsApiClient;
     readonly apiKey!: string;
@@ -15,7 +18,7 @@ export class Metering {
     private isStarted: boolean = false;
 
     /**
-     * Initialize a new metering client without any side effects. Call start() to start up ingestion client. 
+     * Initialize a new metering client without any side effects. Call start() to start up the ingestion client. 
      * @param apiKey 
      * @param debug 
      * @param ingestOptions 
@@ -32,7 +35,7 @@ export class Metering {
     }
 
     /**
-     * Start and initialize the ingestion client. If this is not called, all other calls will fail.
+     * Start and initialize the ingestion client. If this is not called, all ingestion calls will fail. 
      */
     start() {
         if (this.isStarted) {
@@ -43,7 +46,9 @@ export class Metering {
     }
 
     /**
-     * Ingest a meter
+     * Queue a meter for ingestion. 
+     * In auto flush mode, queue will be flushed automatically when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
+     * In manual flush mode, call flush() To ingest messages in the queue
      * @param {string} meterName 
      * @param {number} meterValue 
      * @param {number} utcTimeMillis 
@@ -88,15 +93,12 @@ export class Metering {
     }
 
     /**
-     * Add or update if exists customer. This is a blocking syncronous call. 
+     * Add or update customer details.
      * @param customerId 
      * @param customerName 
      * @param traits 
      */
-    addOrUpdateCustomerDetails(customerId: string, customerName: string, traits?: Map<string, string>) {
-        if (!this.isStarted) {
-            throw new Error(Errors.START_NOT_CALLED);
-        }
+    async addOrUpdateCustomerDetails(customerId: string, customerName: string, traits?: Map<string, string>) {
         let validations = [];
         if (!customerId.trim()) {
             validations.push(Errors.MISSING_CUSTOMER_ID);
@@ -108,29 +110,28 @@ export class Metering {
             throw new Error(`Invalid customer message: ${validations}`);
         }
         let payload = new CustomerDetailsApiPayload(customerId, customerName, traits);
-        //syncrhonous call
-        this.customerDetailsApiClient.post(payload);
+        return this.customerDetailsApiClient.post(payload);
     }
 
     /**
-     * Process all pending ingestion meter messages. Synchronous call.
+     * Process all pending ingestion meter messages and wait for all requests to API to complete.
      */
-    flush() {
+    async flush() {
         if (!this.isStarted) {
             throw new Error(Errors.START_NOT_CALLED);
         }
-        console.log(this.signature, 'flushing ...');
-        this.ingestClient.flush();
+        console.log(new Date(), this.signature, 'flushing ...');
+        return this.ingestClient.flush();
     }
 
     /**
-     * Shutdown the ingestion client. Synchronous call.
+     * Shutdown the ingestion client. 
      */
-    shutdown() {
+    async shutdown() {
         if (!this.isStarted) {
             throw new Error(Errors.START_NOT_CALLED);
         }
-        console.log(this.signature, 'shutting down ...');
-        this.ingestClient.shutdown();
+        console.log(new Date(), this.signature, 'shutting down ...');
+        return this.ingestClient.shutdown();
     }
 }

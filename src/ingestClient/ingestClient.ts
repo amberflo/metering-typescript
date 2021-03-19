@@ -9,6 +9,6 @@ export interface IngestClient {
      */
     start(): void;
     ingestMeter(meter: MeterMessage): void;
-    flush(): void;
-    shutdown(): void;
+    flush():Promise<any>;
+    shutdown():Promise<any>;
 }

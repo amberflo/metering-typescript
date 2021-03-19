@@ -23,26 +23,36 @@ export class IngestApiClient {
         });
     }
 
-    post(payload: Array<IngestApiPayload>, requestId: string, done?: (requestId: string) => void) {
-        console.log(this.signature, 'calling Ingest API with Request ID', requestId);
-        let promise = this.axiosInstance
+    post(payload: Array<IngestApiPayload>, requestId: string, done?: () => void) {
+        console.log(new Date(), this.signature, 'calling Ingest API with Request ID', requestId);
+        return this.axiosInstance
             .post('/ingest-endpoint', payload)
             .then((response) => {
-                console.log("response from Ingest API: ", response.status, response.data);
+                console.log(new Date(), this.signature, "response from Ingest API: ", requestId, response.status, response.data);
                 if (response.status >= 300) {
-                    console.log(`call to Ingest API failed ${response.status}, ${response.data}`);
+                    console.log(`${this.signature} call to Ingest API failed ${response.status}, ${response.data}`);
                 }
                 if (done) {
-                    done(requestId);
+                    done();
                 }
             })
             .catch((error) => {
-                console.log(`call to Ingest API failed ${error}`);
+                console.log(this.signature, new Date(), `call to Ingest API failed ${error}`);
                 if (done) {
-                    done(requestId);
+                    done();
                 }
             });
+    }
 
-        return promise;
+    async postSync(payload: Array<IngestApiPayload>, requestId: string) {
+        console.log(new Date(), this.signature, 'calling Ingest API with Request ID synchronously', requestId);
+        try {
+            let response = await this.axiosInstance.post('/ingest-endpoint', payload);
+            let data = await response.data;
+            console.log(new Date(), this.signature, 'request completed:', requestId, response.status, data);
+            return response;
+         } catch(error) {
+            console.log(new Date(), this.signature, "error", error);
+        }        
     }
 }

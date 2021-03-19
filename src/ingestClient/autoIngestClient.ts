@@ -6,7 +6,7 @@ import { IngestApiClient } from "./ingestApiClient";
 
 import { v4 as uuidv4 } from 'uuid';
 
-export class AsyncIngestClient implements IngestClient {
+export class AutoIngestClient implements IngestClient {
     apiKey: string;
     queue: Array<MeterMessage>;
     batchSize: number;
@@ -20,12 +20,12 @@ export class AsyncIngestClient implements IngestClient {
         this.apiKey = apiKey;
         this.queue = [];
         this.promises = new Map<string, Promise<void>>();
-       
+
         //options
         let options = ingestOptions || new IngestOptions();
         this.batchSize = (options.batchSize) ? Math.max(options.batchSize, 1) : 100;
-        this.frequencyMillis = (options.frequencyMillis) ? Math.max(options.frequencyMillis, 1) : 1000;        
-        this.signature = '[amberflo-metering AsyncIngestClient]:';        
+        this.frequencyMillis = (options.frequencyMillis) ? Math.max(options.frequencyMillis, 1) : 1000;
+        this.signature = '[amberflo-metering AsyncIngestClient]:';
     }
 
     public start(): void {
@@ -35,7 +35,7 @@ export class AsyncIngestClient implements IngestClient {
         console.log(`${this.signature} batch size: ${this.batchSize}`);
 
         console.log(this.signature, 'starting the timer to run at ms: ', this.frequencyMillis);
-        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);        
+        this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
     }
 
     ingestMeter(meter: MeterMessage) {
@@ -49,14 +49,14 @@ export class AsyncIngestClient implements IngestClient {
     }
 
     done(requestId: string) {
-        console.log(this.signature, 'request completed:', requestId);
+        console.log(new Date(), this.signature, 'request completed:', requestId);
         this.promises.delete(requestId);
     }
 
     dequeue() {
-        console.log(this.signature, 'dequeuing ...');
+        console.log(new Date(), this.signature, 'dequeuing ...');
         if (this.queue.length < 1) {
-            console.log(this.signature, 'no records in the queue to flush');
+            console.log(new Date(), this.signature, 'no records in the queue to flush');
             return;
         }
 
@@ -65,15 +65,15 @@ export class AsyncIngestClient implements IngestClient {
         while (snapshot.length > 0) {
             console.log(this.signature, 'call ingest API, iteration: ', iteration++);
             const items = snapshot.splice(0, this.batchSize);
-            console.log(this.signature, 'spliced items:', items);
+            console.log(new Date(), this.signature, 'spliced items:', items);
 
             let body = IngestHelper.transformMessagesToPayload(items);
-            console.log(this.signature, 'body', body);
+            console.log(new Date(), this.signature, 'body', body);
 
             //make asynchronous call        
             let requestId = uuidv4();
-            console.log(this.signature, 'starting request', requestId);
-            let promise = this.apiClient.post(body, requestId, this.done);
+            console.log(new Date(), this.signature, 'starting request', requestId);
+            let promise = this.apiClient.post(body, requestId, () => { this.done(requestId) });
             this.promises.set(requestId, promise);
         }
     }
@@ -87,21 +87,20 @@ export class AsyncIngestClient implements IngestClient {
 
     async flush() {
         this.dequeue();
-        console.log(this.signature, 'waiting for all requests to complete');
-        let promiseAll = Promise
+        console.log(new Date(), this.signature, 'waiting for all requests to complete');
+        return Promise
             .all(this.promises.values())
             .then(values => {
-                console.log('all promises completed');
+                console.log(new Date(), this.signature, 'all pending requests completed');
             })
             .catch(error => {
-                console.log('waiting for all promises errored', error)
+                console.log(new Date(), this.signature, 'waiting for all promises errored', error)
             });
-        await promiseAll;        
     }
 
     shutdown() {
-        console.log(this.signature, 'shutting down the client');
+        console.log(new Date(), this.signature, 'shutting down the client');
         clearTimeout(this.timer);
-        this.flush();
+        return this.flush();
     }
 }

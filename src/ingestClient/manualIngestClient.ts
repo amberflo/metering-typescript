@@ -6,7 +6,7 @@ import { IngestApiClient } from "./ingestApiClient";
 import { IngestHelper } from "./ingestHelper";
 import { v4 as uuidv4 } from 'uuid';
 
-export class SyncIngestClient implements IngestClient {
+export class ManualIngestClient implements IngestClient {
     apiKey: string;
     signature: string;
     queue: Array<MeterMessage>;
@@ -19,36 +19,32 @@ export class SyncIngestClient implements IngestClient {
     }
 
     start(): void {
-        console.log(this.signature, 'calling start... ');
+        console.log(new Date(), this.signature, 'calling start... ');
         this.apiClient = new IngestApiClient(this.apiKey);
     }
 
     ingestMeter(meter: MeterMessage): void {
-        console.log(this.signature, 'adding meter message to queue: ', meter);
+        console.log(new Date(), this.signature, 'queuing meter message: ', meter);
         this.queue.push(meter);
     }
 
-    async flush(): Promise<void> {
+    async flush() {
         if (this.queue.length < 1) {
-            console.log(this.signature, 'no records in the queue to flush');
+            console.log(new Date(), this.signature, 'no records in the queue to flush');
             return;
         }
 
         let snapshot = this.queue.splice(0, this.queue.length);
         let body = IngestHelper.transformMessagesToPayload(snapshot);
-        console.log(this.signature, 'body', body);
+        console.log(new Date(), this.signature, 'body', body);
 
-        //make asynchronous call        
         let requestId = uuidv4();
-        console.log(this.signature, 'starting request', requestId);
-        let promise = this.apiClient.post(body, requestId);
-        await promise;
-        console.log(this.signature, 'request completed:', requestId);
+        console.log(new Date(), this.signature, 'starting request', requestId);
+        return this.apiClient.postSync(body, requestId);
     }
 
-    shutdown(): void {
-        console.log(this.signature, 'shutting down the client');
-        this.flush();
-        console.log(this.signature, 'client successfully shutdown');
+    shutdown(){
+        console.log(new Date(), this.signature, 'shutting down the client');
+        return this.flush();
     }
 }
