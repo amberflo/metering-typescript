@@ -1,4 +1,5 @@
 import { IngestHelper } from "../src/ingestClient/ingestHelper";
+import { IngestApiPayload } from "../src/model/ingestApiPayload";
 import { MeterMessage } from "../src/model/meterMessage";
 
 describe('IngestHelper', () => {
@@ -15,12 +16,8 @@ describe('IngestHelper', () => {
         expect(payload.length).toStrictEqual(len);
         for (let i = 0; i < len; i++) {
             expect(Object.keys(payload[i]).length).toStrictEqual(6);
-            expect(payload[i].tenant_id).toStrictEqual(messages[i].customerId);
-            expect(payload[i].tenant).toStrictEqual(messages[i].customerName);
-            expect(payload[i].meter_name).toStrictEqual(messages[i].meterName);
-            expect(payload[i].meter_value).toStrictEqual(messages[i].meterValue);
-            expect(payload[i].time).toStrictEqual(messages[i].utcTimeMillis);
-            expect(payload[i].dimensions).toStrictEqual(messages[i].dimensions);
+            let payloadExpected = new IngestApiPayload(messages[i]);
+            expect(payload[i]).toStrictEqual(payloadExpected);           
         }
     });
     test('when meter message dimensions are not set, should get Ingest API payload without dimensions', () => {
