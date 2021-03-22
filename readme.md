@@ -160,8 +160,13 @@ export async function runCustomerDetails() {
     //obtain your Amberflo API Key 
     const apiKey = Constants.apiKey;
 
+    //Traits are optional. Traits can be used as filters or aggregation buckets. 
+    const traits = new Map<string, string>();
+    traits.set("region", "Midwest");
+    traits.set("tenant_type", "Tech");
+
     const metering = new Metering(apiKey, false);
-    await metering.addOrUpdateCustomerDetails('123', 'dell');
+    await metering.addOrUpdateCustomerDetails('123', 'dell', traits);
 
     console.log('customer setup completed!');
 }

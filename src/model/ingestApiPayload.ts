@@ -6,7 +6,7 @@ export class IngestApiPayload{
     meter_name: string;
     meter_value: number;
     time: number;
-    dimensions!: Map<string, string>;
+    dimensions!: any;
 
     constructor(m:MeterMessage){
         this.tenant = m.customerName;
@@ -15,7 +15,10 @@ export class IngestApiPayload{
         this.meter_value= m.meterValue;
         this.time= m.utcTimeMillis;
         if(m.dimensions){
-            this.dimensions = m.dimensions;
+            this.dimensions = {};  
+            m.dimensions.forEach((value, key) => {  
+                this.dimensions[key] = value  
+            });  
         }
     }
 }

@@ -20,7 +20,7 @@ export class CustomerDetailsApiClient {
     }
 
     async post(payload: CustomerDetailsApiPayload) {
-        console.log(new Date(), this.signature, 'calling CustomerDetails API');
+        console.log(new Date(), this.signature, 'calling CustomerDetails API', payload);
 
         const configGet: AxiosRequestConfig = {
             url: '/customer-details-endpoint/?customerId=' + payload.customerId,
