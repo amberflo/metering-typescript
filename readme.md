@@ -83,7 +83,7 @@ export async function runUsage() {
     let result = await client.getUsage(payloadWithName);
     console.log(result);
 
-    //OPTION 1: search by meter id
+    //OPTION 2: search by meter id
     //you can filter the usage by meter id and customer
     let payloadWithId = new UsagePayload();
 
