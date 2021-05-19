@@ -1,4 +1,4 @@
-import { UsageClient, UsagePayload } from "../src";
+import { UsageClient, UsageApiPayload, AggregationType, AggregationInterval, TimeRange } from "../src";
 import * as Constants from './sampleConstants';
 
 export async function runUsage() {
@@ -7,24 +7,48 @@ export async function runUsage() {
 
     //initialize the usage client 
     const client = new UsageClient(apiKey);
-    
-    //prepare your query payload
-    //you can filter the usage by meter name and customer. 
-    let payloadWithName = new UsagePayload();
-    payloadWithName.meterName = 'TypeScript-ApiCalls';
-    payloadWithName.customerName = 'Dell';
 
-    //get usage data with the query params
-    // let result = await client.getUsage(payloadWithName);
-    // console.log(result);
+    // start date time represented as seconds since the Unix Epoch (1970-01-01T00:00:00Z) and using UTC.
+    // following is Start time for last 24 hours
+    const startTimeInSeconds = Math.ceil(((new Date().getTime()) - (24 * 60 * 60 * 1000)) / 1000);
 
-    //you can filter the usage by meter id and customer. 
-    let payloadWithId = new UsagePayload();
-    payloadWithId.meterId = Constants.meterId;
-    payloadWithId.customerName = 'Dell';
+    let timeRange = new TimeRange();
+    timeRange.startTimeInSeconds = startTimeInSeconds;
 
-    let result2 = await client.getUsage(payloadWithId);
-    console.log(result2);
+    // Example 1: group by customers for a specific meter and all customers
+    // setup usage query params
+    // visit following link for description of payload: 
+    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
+    let payload = new UsageApiPayload();
+    payload.meterApiName = 'TypeScript-ApiCalls';
+    payload.aggregation = AggregationType.sum;
+    payload.timeGroupingInterval = AggregationInterval.day;
+    //optional: group the result by customer
+    payload.groupBy = ["customerId"];
+    payload.timeRange = timeRange;
+
+    //Call the usage API
+    let jsonResult = await client.getUsage(payload);
+    // To understand the API response, visit following link: 
+    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
+    console.log(JSON.stringify(jsonResult, null, 2));
+
+
+    //Example 2: filter for a meter for specific customer
+    //setup usage query params
+    let payloadForFilteredCustomer = new UsageApiPayload();
+    payload.meterApiName = 'TypeScript-ApiCalls';
+    payload.aggregation = AggregationType.sum;
+    payload.timeGroupingInterval = AggregationInterval.day;
+    //optional: group the result by customer
+    payload.groupBy = ["customerId"];
+    //Filter result for a specific customer by ID
+    payload.filter = {customerId: ["123"]};
+    payload.timeRange = timeRange;
+
+    //Call the usage API
+    let jsonResultForFilteredCustomer = await client.getUsage(payloadForFilteredCustomer);
+    console.log(JSON.stringify(jsonResultForFilteredCustomer, null, 4));
 }
 
 runUsage();

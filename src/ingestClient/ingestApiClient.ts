@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 import * as Constants from '../model/constants';
-import { IngestApiPayload } from '../model/ingestApiPayload';
+import { MeterMessage } from '../model/meterMessage';
 
 export class IngestApiClient {
     axiosInstance: AxiosInstance;
@@ -23,7 +23,7 @@ export class IngestApiClient {
         });
     }
 
-    post(payload: Array<IngestApiPayload>, requestId: string, done?: () => void) {
+    post(payload: Array<MeterMessage>, requestId: string, done?: () => void) {
         console.log(new Date(), this.signature, 'calling Ingest API with Request ID', requestId);
         return this.axiosInstance
             .post('/ingest-endpoint', payload)
@@ -44,7 +44,7 @@ export class IngestApiClient {
             });
     }
 
-    async postSync(payload: Array<IngestApiPayload>, requestId: string) {
+    async postSync(payload: Array<MeterMessage>, requestId: string) {
         console.log(new Date(), this.signature, 'calling Ingest API with Request ID synchronously', requestId);
         try {
             let response = await this.axiosInstance.post('/ingest-endpoint', payload);

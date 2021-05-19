@@ -1,7 +1,5 @@
 import axios, { AxiosInstance } from "axios";
 import { UsageApiPayload } from "./model/usageApiPayload";
-import { UsagePayload } from "./model/usagePayload";
-import { UsageResult } from "./model/usageResult";
 
 export class UsageClient {
     apiKey: string;
@@ -28,26 +26,15 @@ export class UsageClient {
 
     /**
      * Get usage data.
-     * @param {UsagePayload} payload 
+     * @param {UsageApiPayload} payload 
      * @returns {Promise<UsageResult[]>}
      */
-    async getUsage(payload: UsagePayload): Promise<UsageResult[]> {
-        let body = new UsageApiPayload(payload);       
+    async getUsage(payload: UsageApiPayload): Promise<any[]> {
         try {
-            console.log(new Date(), this.signature, 'calling Usage API', body);
-            let response = await this.axiosInstance.post('/usage-endpoint', body);
+            console.log(new Date(), this.signature, 'calling Usage API', payload);
+            let response = await this.axiosInstance.post('/usage-java', payload);
             console.log(new Date(), this.signature, 'obtained result from Usage API', response.status);
-            let result = new Array<UsageResult>();
-            for (let item of response.data[0]) {
-                let usageResult = new UsageResult();
-                usageResult.customerName = item.tenant;
-                usageResult.meterName = item.measure_name;
-                usageResult.date = item.date;
-                usageResult.operationValue = item.operation_value;
-                result.push(usageResult);
-            }
-
-            return result;
+            return response.data;
         }
         catch (error) {
             console.log(new Date(), this.signature, 'call to Usage API failed', error);

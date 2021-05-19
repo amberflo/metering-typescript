@@ -1,6 +1,6 @@
 {
   "name": "amberflo-metering-typescript",
-  "version": "1.0.4",
+  "version": "2.0.1",
   "description": "Amberflo metering client for TypeScript",
   "keywords": [
     "Amberflo",

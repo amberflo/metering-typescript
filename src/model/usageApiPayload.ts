@@ -1,18 +1,33 @@
-import { UsagePayload } from "..";
+
+export class TimeRange {
+    startTimeInSeconds!: number;
+    endTimeInSeconds?: number;
+}
+
+export class Take {
+    limit?: number;
+    isAscending?: boolean;
+}
+
+export enum AggregationType {
+    sum = 'SUM',
+    min = 'MIN',
+    max = 'MAX',
+}
+
+export enum AggregationInterval {
+    hour = 'HOUR',
+    day = 'DAY',
+    week = 'WEEK',
+    month = 'MONTH'
+}
 
 export class UsageApiPayload {
-    meter_id!: string;
-    meter_name!: string;
-    tenant!: string;
-
-    constructor(payload: UsagePayload) {
-        if (payload.customerName) {
-            this.tenant = payload.customerName;
-        }
-        if (payload.meterName) {
-            this.meter_name = payload.meterName;
-        } else if (payload.meterId) {
-            this.meter_id = payload.meterId;
-        }
-    }
+    meterApiName!: string;
+    aggregation!: AggregationType;
+    timeGroupingInterval!: AggregationInterval;
+    filter?: any;
+    groupBy?: string[];
+    take?: Take;
+    timeRange?: TimeRange;
 }

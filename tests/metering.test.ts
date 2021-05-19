@@ -58,14 +58,14 @@ describe('Metering tests', () => {
         let apiKey = 'my-key';
         let debug = false;
         const metering = new Metering(apiKey, debug);
-        expect(() => { metering.meter('', 0, 0, '', '') }).toThrowError(Errors.START_NOT_CALLED);
+        expect(() => { metering.meter('', 0, 0, '') }).toThrowError(Errors.START_NOT_CALLED);
         expect(async () => { await metering.flush()}).rejects.toThrowError(Errors.START_NOT_CALLED);
         expect(async () => { await metering.shutdown()}).rejects.toThrowError(Errors.START_NOT_CALLED);
     });
     test('when ingesting meter then perform validations', () => {
         let apiKey = 'my-key';
         let debug = false;
-        let errorMessage = 'Invalid meter message: customerId is a required field,customerName is a required field,meterName is a required field,utcTimeMillis is invalid, it should be milliseconds in UTC and not a timestamp in the future';
+        let errorMessage = 'Invalid meter message: customerId is a required field,meterName is a required field,utcTimeMillis is invalid, it should be milliseconds in UTC and not a timestamp in the future';
         const metering = new Metering(apiKey, debug);
 
         jest.spyOn(metering.ingestClient, 'start');
@@ -73,7 +73,7 @@ describe('Metering tests', () => {
 
         metering.start();
         expect(mockedStart).toBeCalledTimes(1);
-        expect(() => { metering.meter('', 0, 0, '', '') }).toThrowError(errorMessage);
+        expect(() => { metering.meter('', 0, 0, '') }).toThrowError(errorMessage);
     });
     test('when ingesting meter then perform utcTimeMillis validations', () => {
         const metering = new Metering('my-key', false);
@@ -85,13 +85,13 @@ describe('Metering tests', () => {
 
         //millis less than 1
         let errorMessage = `Invalid meter message: ${Errors.INVALID_UTC_TIME_MILLIS}`;
-        expect(() => { metering.meter('my-meter', 0, 0, 'customer-id', 'customer') }).toThrowError(errorMessage);
+        expect(() => { metering.meter('my-meter', 0, 0, 'customer-id') }).toThrowError(errorMessage);
         expect(mockedStart).toBeCalledTimes(1);
 
         //millis from a future date  
         let futureDate = Date.now() + (30 * 24 * 12 * 60 * 60 * 1000);
         let errorMessage2 = `Invalid meter message: ${Errors.UTC_TIME_MILLIS_FROM_FUTURE}`;
-        expect(() => { metering.meter('my-meter', 0, futureDate, 'customer-id', 'customer') }).toThrowError(errorMessage2);
+        expect(() => { metering.meter('my-meter', 0, futureDate, 'customer-id',) }).toThrowError(errorMessage2);
     });
     test('when creating customer details then perform validations', () => {
         let apiKey = 'my-key';

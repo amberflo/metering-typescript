@@ -15,7 +15,7 @@ import { IngestOptions, Metering, FlushMode } from "amberflo-metering-typescript
  */
 export async function runIngest() {
     //obtain your Amberflo API Key 
-    const apiKey = ''; 
+    const apiKey = 'my-api-key';
 
     //optional ingest options
     let ingestOptions = new IngestOptions();
@@ -34,7 +34,7 @@ export async function runIngest() {
     //define dimesions for your meters
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
-    dimensions.set("tenant_type", "Tech");
+    dimensions.set("customerType", "Tech");
 
     let j = 0;
     for (j = 0; j < 50; j++) {
@@ -43,11 +43,11 @@ export async function runIngest() {
 
         //Queue meter messages for ingestion. 
         //In auto flush mode, queue will be flushed when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
+        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
     }
 
     //wait for messages and requests to API to complete 
@@ -59,40 +59,58 @@ export async function runIngest() {
 runIngest();
 ```
 
-
-
 # Sample Usage SDK code
 ```typescript
 import { UsageClient, UsagePayload } from "amberflo-metering-typescript";
 
 export async function runUsage() {
-    //TODO: obtain your Amberflo API Key
-    const apiKey = '';
+    //obtain your Amberflo API Key
+    const apiKey = 'my-api-key';
 
     //initialize the usage client 
     const client = new UsageClient(apiKey);
-    
-    //prepare your query payload
-    //OPTION 1: search by meter name
-    //This will filter usage data by meter name and customer
-    let payloadWithName = new UsagePayload();
-    payloadWithName.meterName = 'TypeScript-ApiCalls';
-    payloadWithName.customerName = 'Dell';
 
-    //get usage data with the query params
-    let result = await client.getUsage(payloadWithName);
-    console.log(result);
+    // start date time represented as seconds since the Unix Epoch (1970-01-01T00:00:00Z) and using UTC.
+    // following is Start time for last 24 hours
+    const startTimeInSeconds = Math.ceil(((new Date().getTime()) - (24 * 60 * 60 * 1000)) / 1000);
 
-    //OPTION 2: search by meter id
-    //you can filter the usage by meter id and customer
-    let payloadWithId = new UsagePayload();
+    let timeRange = new TimeRange();
+    timeRange.startTimeInSeconds = startTimeInSeconds;
 
-    //TODO: obtain your Amberflo meter id 
-    payloadWithId.meterId = 'my-meter-id';
-    payloadWithId.customerName = 'Dell';
+    // Example 1: group by customers for a specific meter and all customers
+    // setup usage query params
+    // visit following link for description of payload: 
+    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
+    let payload = new UsageApiPayload();
+    payload.meterApiName = 'TypeScript-ApiCalls';
+    payload.aggregation = AggregationType.sum;
+    payload.timeGroupingInterval = AggregationInterval.day;
+    //optional: group the result by customer
+    payload.groupBy = ["customerId"];
+    payload.timeRange = timeRange;
 
-    let result2 = await client.getUsage(payloadWithId);
-    console.log(result2);
+    //Call the usage API
+    let jsonResult = await client.getUsage(payload);
+    // To understand the API response, visit following link: 
+    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
+    console.log(JSON.stringify(jsonResult, null, 2));
+
+
+    //Example 2: filter for a meter for specific customer
+    //setup usage query params
+    let payloadForFilteredCustomer = new UsageApiPayload();
+    payload.meterApiName = 'TypeScript-ApiCalls';
+    payload.aggregation = AggregationType.sum;
+    payload.timeGroupingInterval = AggregationInterval.day;
+    //optional: group the result by customer
+    payload.groupBy = ["customerId"];
+    //Filter result for a specific customer by ID
+    payload.filter = {customerId: ["123"]};
+    payload.timeRange = timeRange;
+
+    //Call the usage API
+    let jsonResultForFilteredCustomer = await client.getUsage(payloadForFilteredCustomer);
+    console.log(JSON.stringify(jsonResultForFilteredCustomer, null, 4));
 }
 
 runUsage();
@@ -106,8 +124,8 @@ import { IngestOptions, Metering, FlushMode } from "amberflo-metering-typescript
  * This sample illustrates how to ingest your metering data into Amberflo with manual flushing. 
  */
 export async function runIngest() {
-    //TODO: obtain your Amberflo API Key
-    const apiKey = '';
+    //obtain your Amberflo API Key 
+    const apiKey = 'my-api-key';
 
     //optional ingest options
     let ingestOptions = new IngestOptions();
@@ -123,7 +141,7 @@ export async function runIngest() {
     //dimensions are optional
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
-    dimensions.set("tenant_type", "Tech");
+    dimensions.set("customerType", "Tech");
 
     let j = 0;
     for (j = 0; j < 2; j++) {
@@ -131,13 +149,13 @@ export async function runIngest() {
         await delay;
 
         //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
+        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
         console.log(new Date(), 'manually flushing the queue ... ');
-        
+
         //manual flush, ingest all queued meter messages and send to API
         await metering.flush();
     }
@@ -158,15 +176,14 @@ import { Metering } from "amberflo-metering-typescript";
  */
 export async function runCustomerDetails() {
     //obtain your Amberflo API Key 
-    const apiKey = Constants.apiKey;
+    const apiKey = 'my-api-key';
 
-    //Traits are optional. Traits can be used as filters or aggregation buckets. 
     const traits = new Map<string, string>();
-    traits.set("region", "Midwest");
-    traits.set("tenant_type", "Tech");
+    traits.set("stripeId", "cus_AJ6bY3VqcaLAEs");
+    traits.set("customerType", "Tech");
 
     const metering = new Metering(apiKey, false);
-    await metering.addOrUpdateCustomerDetails('123', 'dell', traits);
+    await metering.addOrUpdateCustomerDetails('123', 'Dell', traits);
 
     console.log('customer setup completed!');
 }

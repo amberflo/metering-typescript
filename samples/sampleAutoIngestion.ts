@@ -27,7 +27,7 @@ export async function runIngest() {
     //define dimesions for your meters
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
-    dimensions.set("tenant_type", "Tech");
+    dimensions.set("customerType", "Tech");
 
     let j = 0;
     for (j = 0; j < 50; j++) {
@@ -36,11 +36,11 @@ export async function runIngest() {
 
         //Queue meter messages for ingestion. 
         //In auto flush mode, queue will be flushed when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
+        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
     }
 
     //wait for messages and requests to API to complete 

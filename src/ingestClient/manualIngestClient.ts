@@ -3,8 +3,7 @@ import { IngestOptions } from "../model/ingestOptions";
 import { MeterMessage } from "../model/meterMessage";
 import { IngestApiClient } from "./ingestApiClient";
 
-import { IngestHelper } from "./ingestHelper";
-import { v4 as uuidv4 } from 'uuid';
+import { v1 as uuidv4 } from 'uuid';
 
 export class ManualIngestClient implements IngestClient {
     apiKey: string;
@@ -35,12 +34,11 @@ export class ManualIngestClient implements IngestClient {
         }
 
         let snapshot = this.queue.splice(0, this.queue.length);
-        let body = IngestHelper.transformMessagesToPayload(snapshot);
-        console.log(new Date(), this.signature, 'body', body);
+        console.log(new Date(), this.signature, 'body', snapshot);
 
         let requestId = uuidv4();
         console.log(new Date(), this.signature, 'starting request', requestId);
-        return this.apiClient.postSync(body, requestId);
+        return this.apiClient.postSync(snapshot, requestId);
     }
 
     shutdown(){

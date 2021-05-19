@@ -1,5 +1,5 @@
-import { IngestOptions} from "../src/model/ingestOptions";
-import {Metering} from "../src/metering";
+import { IngestOptions } from "../src/model/ingestOptions";
+import { Metering } from "../src/metering";
 import { FlushMode } from "../src/model/flushMode";
 import * as Constants from './sampleConstants';
 
@@ -24,7 +24,7 @@ export async function runIngest() {
     //dimensions are optional
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
-    dimensions.set("tenant_type", "Tech");
+    dimensions.set("customerType", "Tech");
 
     let j = 0;
     for (j = 0; j < 2; j++) {
@@ -32,13 +32,13 @@ export async function runIngest() {
         await delay;
 
         //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", "Dell", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", "Dell", dimensions);
+        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
+        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
         console.log(new Date(), 'manually flushing the queue ... ');
-        
+
         //manual flush, ingest all queued meter messages and send to API
         await metering.flush();
     }

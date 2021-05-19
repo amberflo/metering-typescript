@@ -9,11 +9,11 @@ export async function runCustomerDetails() {
     const apiKey = Constants.apiKey;
 
     const traits = new Map<string, string>();
-    traits.set("region", "Midwest");
-    traits.set("tenant_type", "Tech");
+    traits.set("stripeId", "cus_AJ6bY3VqcaLAEs");
+    traits.set("customerType", "Tech");
 
     const metering = new Metering(apiKey, false);
-    await metering.addOrUpdateCustomerDetails('123', 'dell', traits);
+    await metering.addOrUpdateCustomerDetails('123', 'Dell', traits);
 
     console.log('customer setup completed!');
 }

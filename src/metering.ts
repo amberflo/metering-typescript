@@ -49,18 +49,17 @@ export class Metering {
      * Queue a meter for ingestion. 
      * In auto flush mode, queue will be flushed automatically when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
      * In manual flush mode, call flush() To ingest messages in the queue
-     * @param {string} meterName 
+     * @param {string} meterApiName 
      * @param {number} meterValue 
-     * @param {number} utcTimeMillis 
+     * @param {number} meterTimeInMillis 
      * @param {string} customerId 
-     * @param {string} customerName 
      * @param {Map<string,string>} dimensions 
      */
-    meter(meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions?: Map<string, string>) {
+    meter(meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions?: Map<string, string>) {
         if (!this.isStarted) {
             throw new Error(Errors.START_NOT_CALLED);
         }
-        let meterMessage = new MeterMessage(meterName, meterValue, utcTimeMillis, customerId, customerName, dimensions);
+        let meterMessage = new MeterMessage(meterApiName, meterValue, meterTimeInMillis, customerId, dimensions);
         let validations = Metering.validateMeterMessage(meterMessage);
         if (validations.length > 0) {
             throw new Error(`Invalid meter message: ${validations}`);
@@ -76,16 +75,13 @@ export class Metering {
         if (!meterMessage.customerId.trim()) {
             validations.push(Errors.MISSING_CUSTOMER_ID);
         }
-        if (!meterMessage.customerName.trim()) {
-            validations.push(Errors.MISSING_CUSTOMER_NAME);
-        }
-        if (!meterMessage.meterName.trim()) {
+        if (!meterMessage.meterApiName.trim()) {
             validations.push(Errors.MISSING_METER_NAME);
         }
-        if (meterMessage.utcTimeMillis < 1) {
+        if (meterMessage.meterTimeInMillis < 1) {
             validations.push(Errors.INVALID_UTC_TIME_MILLIS);
         }
-        if (meterMessage.utcTimeMillis > currentMillis) {
+        if (meterMessage.meterTimeInMillis > currentMillis) {
             validations.push(Errors.UTC_TIME_MILLIS_FROM_FUTURE);
         }
 

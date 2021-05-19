@@ -1,10 +1,9 @@
 import { MeterMessage } from "../model/meterMessage";
 import { IngestOptions } from "../model/ingestOptions";
 import { IngestClient } from "./ingestClient";
-import { IngestHelper } from "./ingestHelper";
 import { IngestApiClient } from "./ingestApiClient";
 
-import { v4 as uuidv4 } from 'uuid';
+import { v1 } from 'uuid';
 
 export class AutoIngestClient implements IngestClient {
     apiKey: string;
@@ -65,15 +64,12 @@ export class AutoIngestClient implements IngestClient {
         while (snapshot.length > 0) {
             console.log(this.signature, 'call ingest API, iteration: ', iteration++);
             const items = snapshot.splice(0, this.batchSize);
-            console.log(new Date(), this.signature, 'spliced items:', items);
-
-            let body = IngestHelper.transformMessagesToPayload(items);
-            console.log(new Date(), this.signature, 'body', body);
+            console.log(new Date(), this.signature, 'spliced items and payload:', items);
 
             //make asynchronous call        
-            let requestId = uuidv4();
+            let requestId = v1();
             console.log(new Date(), this.signature, 'starting request', requestId);
-            let promise = this.apiClient.post(body, requestId, () => { this.done(requestId) });
+            let promise = this.apiClient.post(items, requestId, () => { this.done(requestId) });
             this.promises.set(requestId, promise);
         }
     }

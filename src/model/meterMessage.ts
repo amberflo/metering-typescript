@@ -1,21 +1,24 @@
-import { stringify } from "uuid";
+import { v1 } from 'uuid';
 
 export class MeterMessage {
-    meterName: string;
-    meterValue: number;
-    utcTimeMillis: number;
+    uniqueId?: string;
+    meterApiName: string;
     customerId: string;
-    customerName: string;
-    dimensions!: Map<string, string>;
+    meterValue: number;
+    meterTimeInMillis: number;    
+    dimensions!: any;
 
-    constructor(meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, customerName: string, dimensions?: Map<string, string>) {
-        this.meterName = meterName;
+    constructor(meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions?: Map<string, string>) {
+        this.uniqueId = v1();
+        this.meterApiName = meterApiName;
         this.meterValue = meterValue;
-        this.utcTimeMillis = utcTimeMillis;
+        this.meterTimeInMillis = meterTimeInMillis;
         this.customerId = customerId;
-        this.customerName = customerName;
         if(dimensions){
-            this.dimensions = dimensions;
+            this.dimensions = {};  
+            dimensions.forEach((value, key) => {  
+                this.dimensions[key] = value  
+            });  
         }
     }
 }
