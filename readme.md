@@ -61,7 +61,7 @@ runIngest();
 
 # Sample Usage SDK code
 ```typescript
-import { UsageClient, UsagePayload } from "amberflo-metering-typescript";
+import { UsageClient, UsageApiPayload, AggregationType, AggregationInterval, TimeRange } from "amberflo-metering-typescript";
 
 export async function runUsage() {
     //obtain your Amberflo API Key
@@ -93,20 +93,20 @@ export async function runUsage() {
     let jsonResult = await client.getUsage(payload);
     // To understand the API response, visit following link: 
     // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
-    console.log(JSON.stringify(jsonResult, null, 2));
+    console.log(JSON.stringify(jsonResult, null, 4));
 
 
     //Example 2: filter for a meter for specific customer
     //setup usage query params
     let payloadForFilteredCustomer = new UsageApiPayload();
-    payload.meterApiName = 'TypeScript-ApiCalls';
-    payload.aggregation = AggregationType.sum;
-    payload.timeGroupingInterval = AggregationInterval.day;
+    payloadForFilteredCustomer.meterApiName = 'TypeScript-ApiCalls';
+    payloadForFilteredCustomer.aggregation = AggregationType.sum;
+    payloadForFilteredCustomer.timeGroupingInterval = AggregationInterval.day;
     //optional: group the result by customer
-    payload.groupBy = ["customerId"];
+    payloadForFilteredCustomer.groupBy = ["customerId"];
     //Filter result for a specific customer by ID
-    payload.filter = {customerId: ["123"]};
-    payload.timeRange = timeRange;
+    payloadForFilteredCustomer.filter = {customerId: ["123"]};
+    payloadForFilteredCustomer.timeRange = timeRange;
 
     //Call the usage API
     let jsonResultForFilteredCustomer = await client.getUsage(payloadForFilteredCustomer);
