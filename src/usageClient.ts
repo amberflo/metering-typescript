@@ -32,7 +32,7 @@ export class UsageClient {
     async getUsage(payload: UsageApiPayload): Promise<any[]> {
         try {
             console.log(new Date(), this.signature, 'calling Usage API', payload);
-            let response = await this.axiosInstance.post('/usage-java', payload);
+            let response = await this.axiosInstance.post('/usage', payload);
             console.log(new Date(), this.signature, 'obtained result from Usage API', response.status);
             return response.data;
         }

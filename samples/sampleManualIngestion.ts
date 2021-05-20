@@ -32,7 +32,7 @@ export async function runIngest() {
         await delay;
 
         //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);

@@ -36,7 +36,7 @@ export async function runIngest() {
 
         //Queue meter messages for ingestion. 
         //In auto flush mode, queue will be flushed when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
-        //Params: meterName: string, meterValue: number, utcTimeMillis: number, customerId: string, dimensions: Map<string, string>
+        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
