@@ -31,44 +31,34 @@ export class AutoIngestClient implements IngestClient {
         console.log(this.signature, 'calling start ...');
         this.apiClient = new IngestApiClient(this.apiKey);
 
-        console.log(`${this.signature} batch size: ${this.batchSize}`);
-
-        console.log(this.signature, 'starting the timer to run at ms: ', this.frequencyMillis);
         this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
     }
 
     ingestMeter(meter: MeterMessage) {
-        console.log(this.signature, 'adding meter message to queue: ', meter);
         this.queue.push(meter);
 
         if (this.queue.length >= this.batchSize) {
-            console.log(this.signature, 'queue exceeded batch size, so flushing before timer');
+            // queue exceeded batch size, so flushing before timer
             this.dequeue();
         }
     }
 
     done(requestId: string) {
-        console.log(new Date(), this.signature, 'request completed:', requestId);
         this.promises.delete(requestId);
     }
 
     dequeue() {
-        console.log(new Date(), this.signature, 'dequeuing ...');
         if (this.queue.length < 1) {
-            console.log(new Date(), this.signature, 'no records in the queue to flush');
             return;
         }
 
         let snapshot = this.queue.splice(0, this.queue.length);
         let iteration = 0;
         while (snapshot.length > 0) {
-            console.log(this.signature, 'call ingest API, iteration: ', iteration++);
             const items = snapshot.splice(0, this.batchSize);
-            console.log(new Date(), this.signature, 'spliced items and payload:', items);
 
             //make asynchronous call        
             let requestId = v1();
-            console.log(new Date(), this.signature, 'starting request', requestId);
             let promise = this.apiClient.post(items, requestId, () => { this.done(requestId) });
             this.promises.set(requestId, promise);
         }

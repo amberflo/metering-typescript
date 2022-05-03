@@ -20,8 +20,6 @@ export class CustomerDetailsApiClient {
     }
 
     async post(payload: CustomerDetailsApiPayload) {
-        console.log(new Date(), this.signature, 'calling CustomerDetails API', payload);
-
         const configGet: AxiosRequestConfig = {
             url: '/customer-details-endpoint/?customerId=' + payload.customerId,
             method: 'get',
@@ -35,7 +33,6 @@ export class CustomerDetailsApiClient {
 
         let resultGet = await this.axiosInstance.request(configGet);
         const httpMethod = (Object.keys(resultGet.data).length > 0) ? 'put' : 'post';
-        console.log(new Date(), this.signature, 'http method is:', httpMethod);
 
         const config: AxiosRequestConfig = {
             url: '/customer-details-endpoint',
@@ -51,7 +48,6 @@ export class CustomerDetailsApiClient {
 
         return this.axiosInstance.request(config)
             .then((response) => {
-                console.log(new Date(), this.signature, "response from CustomerDetails API: ", response.status, response.data);
                 if (response.status >= 300) {
                     console.log(`call to CustomerDetails API failed ${response.status}, ${response.data}`);
                     throw new Error(`${Errors.CUSTOMER_DETAILS_API_ERROR} ${response.status}, ${response.data}`);

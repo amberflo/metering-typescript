@@ -23,21 +23,17 @@ export class ManualIngestClient implements IngestClient {
     }
 
     ingestMeter(meter: MeterMessage): void {
-        console.log(new Date(), this.signature, 'queuing meter message: ', meter);
         this.queue.push(meter);
     }
 
     async flush() {
         if (this.queue.length < 1) {
-            console.log(new Date(), this.signature, 'no records in the queue to flush');
             return;
         }
 
         let snapshot = this.queue.splice(0, this.queue.length);
-        console.log(new Date(), this.signature, 'body', snapshot);
 
         let requestId = uuidv4();
-        console.log(new Date(), this.signature, 'starting request', requestId);
         return this.apiClient.postSync(snapshot, requestId);
     }
 
