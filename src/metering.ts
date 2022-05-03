@@ -30,8 +30,8 @@ export class Metering {
         this.signature = '[amberflo-metering Metering]:';
         this.apiKey = apiKey;
         this.debug = debug;
-        this.ingestClient = IngestClientFactory.getNewInstance(apiKey, ingestOptions);
-        this.customerDetailsApiClient = new CustomerDetailsApiClient(apiKey);
+        this.ingestClient = IngestClientFactory.getNewInstance(apiKey, debug, ingestOptions);
+        this.customerDetailsApiClient = new CustomerDetailsApiClient(apiKey, debug);
     }
 
     /**

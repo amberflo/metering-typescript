@@ -24,7 +24,7 @@ export class IngestApiClient {
     }
 
     post(payload: Array<MeterMessage>, requestId: string, done?: () => void) {
-        console.log(new Date(), this.signature, 'calling Ingest API with Request ID', requestId);
+        // console.log(new Date(), this.signature, 'calling Ingest API with Request ID', requestId);
         return this.axiosInstance
             .post('/ingest-endpoint', payload)
             .then((response) => {
@@ -45,7 +45,7 @@ export class IngestApiClient {
     }
 
     async postSync(payload: Array<MeterMessage>, requestId: string) {
-        console.log(new Date(), this.signature, 'calling Ingest API with Request ID synchronously', requestId);
+        // console.log(new Date(), this.signature, 'calling Ingest API with Request ID synchronously', requestId);
         try {
             let response = await this.axiosInstance.post('/ingest', payload);
             let data = await response.data;

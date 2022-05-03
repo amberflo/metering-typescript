@@ -8,11 +8,13 @@ export class CustomerDetailsApiClient {
     axiosInstance: AxiosInstance;
     signature: string;
     apiKey: string;
+    debug: boolean;
 
-    constructor(apiKey: string) {
+    constructor(apiKey: string, debug: boolean = false) {
         this.apiKey = apiKey;
         this.signature = '[amberflo-metering CustomerDetailsApiClient]:';
         this.axiosInstance = axios.create();
+        this.debug = debug;
         axiosRetry(this.axiosInstance, {
             retries: 3,
             retryDelay: axiosRetry.exponentialDelay
@@ -20,7 +22,9 @@ export class CustomerDetailsApiClient {
     }
 
     async post(payload: CustomerDetailsApiPayload) {
-        console.log(new Date(), this.signature, 'calling CustomerDetails API', payload);
+        if(this.debug){
+            console.log(new Date(), this.signature, 'calling CustomerDetails API', payload);
+        }
 
         const configGet: AxiosRequestConfig = {
             url: '/customer-details-endpoint/?customerId=' + payload.customerId,
@@ -35,7 +39,9 @@ export class CustomerDetailsApiClient {
 
         let resultGet = await this.axiosInstance.request(configGet);
         const httpMethod = (Object.keys(resultGet.data).length > 0) ? 'put' : 'post';
-        console.log(new Date(), this.signature, 'http method is:', httpMethod);
+        if(this.debug){
+            console.log(new Date(), this.signature, 'http method is:', httpMethod);
+        }
 
         const config: AxiosRequestConfig = {
             url: '/customer-details-endpoint',
@@ -51,7 +57,9 @@ export class CustomerDetailsApiClient {
 
         return this.axiosInstance.request(config)
             .then((response) => {
-                console.log(new Date(), this.signature, "response from CustomerDetails API: ", response.status, response.data);
+                if(this.debug){
+                    console.log(new Date(), this.signature, "response from CustomerDetails API: ", response.status, response.data);
+                }
                 if (response.status >= 300) {
                     console.log(`call to CustomerDetails API failed ${response.status}, ${response.data}`);
                     throw new Error(`${Errors.CUSTOMER_DETAILS_API_ERROR} ${response.status}, ${response.data}`);

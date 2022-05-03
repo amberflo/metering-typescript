@@ -5,14 +5,16 @@ export class UsageClient {
     apiKey: string;
     axiosInstance: AxiosInstance;
     signature: string;
+    debug: boolean;
 
     /**
      * Initialize a new `UsageClient` with API key
      * @param {string} apiKey 
      */
-    constructor(apiKey: string) {
+    constructor(apiKey: string, debug: boolean = false) {
         this.signature = '[amberflo-metering UsageClient]:';
         this.apiKey = apiKey;
+        this.debug = debug;
         this.axiosInstance = axios.create({
             baseURL: 'https://app.amberflo.io',
             responseType: 'json',
@@ -31,7 +33,9 @@ export class UsageClient {
      */
     async getUsage(payload: UsageApiPayload): Promise<any[]> {
         try {
-            console.log(new Date(), this.signature, 'calling Usage API', payload);
+            if(this.debug){
+                console.log(new Date(), this.signature, 'calling Usage API', payload);
+            }
             let response = await this.axiosInstance.post('/usage', payload);
             console.log(new Date(), this.signature, 'obtained result from Usage API', response.status);
             return response.data;

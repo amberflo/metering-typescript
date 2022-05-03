@@ -18,15 +18,17 @@ export async function runIngest() {
     const apiKey = 'my-api-key';
 
     //optional ingest options
-    let ingestOptions = new IngestOptions();
+    const ingestOptions = new IngestOptions();
     //set flush mode to auto. This is also the default, so this step is optional.
     ingestOptions.flushMode = FlushMode.auto;
     //Number of messages posted to the API. Default is 100. 
     ingestOptions.batchSize = 20;
     //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
     ingestOptions.frequencyMillis = 3000;
+    //Set to true to log debug statements
+    const debug = false;
 
-    const metering = new Metering(apiKey, false, ingestOptions);
+    const metering = new Metering(apiKey, debug, ingestOptions);
 
     //initialize and start the ingestion client
     metering.start();
@@ -36,9 +38,8 @@ export async function runIngest() {
     dimensions.set("region", "Midwest");
     dimensions.set("customerType", "Tech");
 
-    let j = 0;
-    for (j = 0; j < 50; j++) {
-        let delay = new Promise(resolve => setTimeout(resolve, 100));
+    for (let j = 0; j < 50; j++) {
+        const delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
 
         //Queue meter messages for ingestion. 
@@ -66,9 +67,11 @@ import { UsageClient, UsageApiPayload, AggregationType, AggregationInterval, Tim
 export async function runUsage() {
     //obtain your Amberflo API Key
     const apiKey = 'my-api-key';
+    //Set to true to log debug statements
+    const debug = false;
 
     //initialize the usage client 
-    const client = new UsageClient(apiKey);
+    const client = new UsageClient(apiKey, debug);
 
     // start date time represented as seconds since the Unix Epoch (1970-01-01T00:00:00Z) and using UTC.
     // following is Start time for last 24 hours
@@ -126,13 +129,15 @@ import { IngestOptions, Metering, FlushMode } from "amberflo-metering-typescript
 export async function runIngest() {
     //obtain your Amberflo API Key 
     const apiKey = 'my-api-key';
+    //Set to true to log debug statements
+    const debug = false;    
 
     //optional ingest options
     let ingestOptions = new IngestOptions();
     //set flush mode manual to control when to ingest meter messages in the queue 
     ingestOptions.flushMode = FlushMode.manual;
 
-    const metering = new Metering(apiKey, false, ingestOptions);
+    const metering = new Metering(apiKey, debug, ingestOptions);
 
     //initialize and start the ingestion client
     metering.start();
@@ -143,9 +148,8 @@ export async function runIngest() {
     dimensions.set("region", "Midwest");
     dimensions.set("customerType", "Tech");
 
-    let j = 0;
-    for (j = 0; j < 2; j++) {
-        let delay = new Promise(resolve => setTimeout(resolve, 100));
+    for (let j = 0; j < 2; j++) {
+        const delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
 
         //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
@@ -177,12 +181,14 @@ import { Metering } from "amberflo-metering-typescript";
 export async function runCustomerDetails() {
     //obtain your Amberflo API Key 
     const apiKey = 'my-api-key';
+    //Set to true to log debug statements
+    const debug = false;        
 
     const traits = new Map<string, string>();
     traits.set("stripeId", "cus_AJ6bY3VqcaLAEs");
     traits.set("customerType", "Tech");
 
-    const metering = new Metering(apiKey, false);
+    const metering = new Metering(apiKey, debug);
     await metering.addOrUpdateCustomerDetails('123', 'Dell', traits);
 
     console.log('customer setup completed!');

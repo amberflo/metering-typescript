@@ -10,20 +10,24 @@ export class ManualIngestClient implements IngestClient {
     signature: string;
     queue: Array<MeterMessage>;
     apiClient!: IngestApiClient;
+    debug: boolean = false;
 
-    constructor(apiKey: string, ingestOptions: IngestOptions) {
+    constructor(apiKey: string, ingestOptions: IngestOptions, debug:boolean=false) {
         this.queue = [];
         this.apiKey = apiKey;
         this.signature = '[amberflo-metering SynchIngestClient]:';
+        this.debug = debug;
     }
 
     start(): void {
-        console.log(new Date(), this.signature, 'calling start... ');
+        console.log(new Date(), this.signature, `start the client with debug ${this.debug} `);
         this.apiClient = new IngestApiClient(this.apiKey);
     }
 
     ingestMeter(meter: MeterMessage): void {
-        console.log(new Date(), this.signature, 'queuing meter message: ', meter);
+        if (this.debug) {
+            console.log(new Date(), this.signature, 'queuing meter message: ', meter);
+        }
         this.queue.push(meter);
     }
 
@@ -34,15 +38,21 @@ export class ManualIngestClient implements IngestClient {
         }
 
         let snapshot = this.queue.splice(0, this.queue.length);
-        console.log(new Date(), this.signature, 'body', snapshot);
+        if (this.debug) {
+            console.log(new Date(), this.signature, 'body', snapshot);
+        }
 
         let requestId = uuidv4();
-        console.log(new Date(), this.signature, 'starting request', requestId);
+        if (this.debug) {
+            console.log(new Date(), this.signature, 'starting request', requestId);
+        }
         return this.apiClient.postSync(snapshot, requestId);
     }
 
-    shutdown(){
-        console.log(new Date(), this.signature, 'shutting down the client');
+    shutdown() {
+        if(this.debug){
+            console.log(new Date(), this.signature, 'shutting down the client');
+        }
         return this.flush();
     }
 }
