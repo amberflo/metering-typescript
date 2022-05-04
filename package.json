@@ -11,6 +11,7 @@
   "types": "dist/index.d.ts",
   "prepublish": "tsc",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "test": "jest"
   },
   "repository": {
