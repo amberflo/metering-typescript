@@ -13,7 +13,8 @@
   "scripts": {
     "fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig-build.json",
     "test": "jest"
   },
   "repository": {
