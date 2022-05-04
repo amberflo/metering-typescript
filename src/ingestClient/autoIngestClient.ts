@@ -14,15 +14,15 @@ export class AutoIngestClient implements IngestClient {
     signature: string;
     promises: Map<string, Promise<void>>;
     apiClient!: IngestApiClient;
-    debug: boolean = false;
+    debug = false;
 
-    constructor(apiKey: string, ingestOptions?: IngestOptions, debug:boolean=false) {
+    constructor(apiKey: string, ingestOptions?: IngestOptions, debug=false) {
         this.apiKey = apiKey;
         this.queue = [];
         this.promises = new Map<string, Promise<void>>();
 
         //options
-        let options = ingestOptions || new IngestOptions();
+        const options = ingestOptions || new IngestOptions();
         this.batchSize = (options.batchSize) ? Math.max(options.batchSize, 1) : 100;
         this.frequencyMillis = (options.frequencyMillis) ? Math.max(options.frequencyMillis, 1) : 1000;
         this.signature = '[amberflo-metering AsyncIngestClient]:';
@@ -67,7 +67,7 @@ export class AutoIngestClient implements IngestClient {
             return;
         }
 
-        let snapshot = this.queue.splice(0, this.queue.length);
+        const snapshot = this.queue.splice(0, this.queue.length);
         let iteration = 0;
         while (snapshot.length > 0) {
             if (this.debug) {
@@ -78,18 +78,18 @@ export class AutoIngestClient implements IngestClient {
                 console.log(new Date(), this.signature, 'spliced items and payload:', items);
             }
 
-            //make asynchronous call        
-            let requestId = v1();
+            //make asynchronous call
+            const requestId = v1();
             if (this.debug) {
                 console.log(new Date(), this.signature, 'starting request', requestId);
             }
-            let promise = this.apiClient.post(items, requestId, () => { this.done(requestId) });
+            const promise = this.apiClient.post(items, requestId, () => { this.done(requestId) });
             this.promises.set(requestId, promise);
         }
     }
 
     dequeueTimer() {
-        //re-schedule         
+        //re-schedule
         clearTimeout(this.timer);
         this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
         this.dequeue();

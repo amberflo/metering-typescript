@@ -7,10 +7,10 @@ export class CustomerDetailsApiPayload{
         this.customerId = customerId;
         this.customerName = customerName;
         if(traits){
-            this.traits = {};  
-            traits.forEach((value, key) => {  
-                this.traits[key] = value  
-            });  
+            this.traits = {};
+            traits.forEach((value, key) => {
+                this.traits[key] = value
+            });
         }
     }
 }

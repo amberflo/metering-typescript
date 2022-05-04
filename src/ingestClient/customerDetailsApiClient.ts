@@ -10,7 +10,7 @@ export class CustomerDetailsApiClient {
     apiKey: string;
     debug: boolean;
 
-    constructor(apiKey: string, debug: boolean = false) {
+    constructor(apiKey: string, debug = false) {
         this.apiKey = apiKey;
         this.signature = '[amberflo-metering CustomerDetailsApiClient]:';
         this.axiosInstance = axios.create();
@@ -37,7 +37,7 @@ export class CustomerDetailsApiClient {
             timeout: 30000
         };
 
-        let resultGet = await this.axiosInstance.request(configGet);
+        const resultGet = await this.axiosInstance.request(configGet);
         const httpMethod = (Object.keys(resultGet.data).length > 0) ? 'put' : 'post';
         if(this.debug){
             console.log(new Date(), this.signature, 'http method is:', httpMethod);
