@@ -1,5 +1,5 @@
 import BaseClient from "./baseClient";
-import { IUsageApiPayload, IAllUsageApiPayload, IUsageApiResult } from "./model/usageApiPayload";
+import { UsageApiPayload, AllUsageApiPayload, IUsageReport } from "./model/usageApiPayload";
 
 export class UsageClient extends BaseClient {
 
@@ -17,8 +17,9 @@ export class UsageClient extends BaseClient {
      * @param {UsageApiPayload} query
      * @returns {Promise<UsageApiResult>}
      */
-    async getUsage(query: IUsageApiPayload): Promise<IUsageApiResult> {
-        return await this.post<IUsageApiResult, IUsageApiPayload>('/usage', query);
+    async getUsage(query: UsageApiPayload): Promise<IUsageReport> {
+        query.validate()
+        return await this.post<IUsageReport, UsageApiPayload>('/usage', query);
     }
 
     /**
@@ -26,8 +27,9 @@ export class UsageClient extends BaseClient {
      * @param {UsageApiPayload[]} query
      * @returns {Promise<UsageApiResult[]>}
      */
-    async getUsageBatch(query: IUsageApiPayload[]): Promise<IUsageApiResult[]> {
-        return await this.post<IUsageApiResult[], IUsageApiPayload[]>('/usage/batch', query);
+    async getUsageBatch(queries: UsageApiPayload[]): Promise<IUsageReport[]> {
+        queries.forEach((q) => q.validate())
+        return await this.post<IUsageReport[], UsageApiPayload[]>('/usage/batch', queries);
     }
 
     /**
@@ -35,7 +37,8 @@ export class UsageClient extends BaseClient {
      * @param {AllUsageApiPayload} query
      * @returns {Promise<UsageApiResult[]>}
      */
-    async getAllUsage(query: IAllUsageApiPayload): Promise<IUsageApiResult[]> {
-        return await this.get<IUsageApiResult[], IAllUsageApiPayload>('/usage/all', query);
+    async getAllUsage(query: AllUsageApiPayload): Promise<IUsageReport[]> {
+        query.validate()
+        return await this.get<IUsageReport[], AllUsageApiPayload>('/usage/all', query);
     }
 }
