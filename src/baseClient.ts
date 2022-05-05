@@ -34,20 +34,24 @@ export default class BaseClient {
         });
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     private log(level: string, message: string, ...args: any[]) {
         console.log(new Date(), this.signature, level, message, ...args);
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     log_info(message: string, ...args: any[]) {
         this.log('INFO', message, ...args)
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     log_debug(message: string, ...args: any[]) {
         if (this.debug) {
             this.log('DEBUG', message, ...args)
         }
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     log_error(message: string, ...args: any[]) {
         this.log('ERROR', message, ...args)
     }
