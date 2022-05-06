@@ -1,3 +1,7 @@
+/**
+ * This sample illustrates how to query usage
+ */
+
 import {
     AggregationInterval,
     AggregationType,
