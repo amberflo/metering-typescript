@@ -65,7 +65,8 @@ export default class BaseClient {
         this.log('ERROR', message, ...args)
     }
 
-    async do_get<TResponse, TParams=void>(path: string, params?: TParams): Promise<TResponse> {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async do_get<TResponse>(path: string, params?: any): Promise<TResponse> {
         const action = `GET ${path}`
         try {
             this.log_debug(action, params);
@@ -79,11 +80,12 @@ export default class BaseClient {
         }
     }
 
-    async do_post<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async do_post<TResponse>(path: string, payload: any, params?: any): Promise<TResponse> {
         const action = `POST ${path}`
         try {
-            this.log_debug(action, payload);
-            const response = await this.axiosInstance.post<TResponse>(path, payload);
+            this.log_debug(action, payload, params);
+            const response = await this.axiosInstance.post<TResponse>(path, payload, params ? { params } : undefined);
             this.log_info(action, response.status);
             return response.data
         }
@@ -93,7 +95,8 @@ export default class BaseClient {
         }
     }
 
-    async do_put<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async do_put<TResponse>(path: string, payload: any): Promise<TResponse> {
         const action = `PUT ${path}`
         try {
             this.log_debug(action, payload);
