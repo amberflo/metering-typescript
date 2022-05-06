@@ -15,13 +15,13 @@ export class Metering {
     readonly debug!: boolean;
     readonly ingestClient: IngestClient;
     private signature: string;
-    private isStarted: boolean = false;
+    private isStarted = false;
 
     /**
-     * Initialize a new metering client without any side effects. Call start() to start up the ingestion client. 
-     * @param apiKey 
-     * @param debug 
-     * @param ingestOptions 
+     * Initialize a new metering client without any side effects. Call start() to start up the ingestion client.
+     * @param apiKey
+     * @param debug
+     * @param ingestOptions
      */
     constructor(apiKey: string, debug: boolean, ingestOptions?: IngestOptions) {
         if (!apiKey.trim()) {
@@ -35,7 +35,7 @@ export class Metering {
     }
 
     /**
-     * Start and initialize the ingestion client. If this is not called, all ingestion calls will fail. 
+     * Start and initialize the ingestion client. If this is not called, all ingestion calls will fail.
      */
     start() {
         if (this.isStarted) {
@@ -46,21 +46,21 @@ export class Metering {
     }
 
     /**
-     * Queue a meter for ingestion. 
-     * In auto flush mode, queue will be flushed automatically when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis 
+     * Queue a meter for ingestion.
+     * In auto flush mode, queue will be flushed automatically when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis
      * In manual flush mode, call flush() To ingest messages in the queue
-     * @param {string} meterApiName 
-     * @param {number} meterValue 
-     * @param {number} meterTimeInMillis 
-     * @param {string} customerId 
-     * @param {Map<string,string>} dimensions 
+     * @param {string} meterApiName
+     * @param {number} meterValue
+     * @param {number} meterTimeInMillis
+     * @param {string} customerId
+     * @param {Map<string,string>} dimensions
      */
     meter(meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions?: Map<string, string>) {
         if (!this.isStarted) {
             throw new Error(Errors.START_NOT_CALLED);
         }
-        let meterMessage = new MeterMessage(meterApiName, meterValue, meterTimeInMillis, customerId, dimensions);
-        let validations = Metering.validateMeterMessage(meterMessage);
+        const meterMessage = new MeterMessage(meterApiName, meterValue, meterTimeInMillis, customerId, dimensions);
+        const validations = Metering.validateMeterMessage(meterMessage);
         if (validations.length > 0) {
             throw new Error(`Invalid meter message: ${validations}`);
         }
@@ -68,9 +68,9 @@ export class Metering {
     }
 
     static validateMeterMessage(meterMessage: MeterMessage) {
-        let validations = [];
+        const validations = [];
         //threshold of 5 mins in the future
-        let currentMillis = Date.now() + (5 * 60 * 1000);
+        const currentMillis = Date.now() + (5 * 60 * 1000);
 
         if (!meterMessage.customerId.trim()) {
             validations.push(Errors.MISSING_CUSTOMER_ID);
@@ -90,12 +90,12 @@ export class Metering {
 
     /**
      * Add or update customer details.
-     * @param customerId 
-     * @param customerName 
-     * @param traits 
+     * @param customerId
+     * @param customerName
+     * @param traits
      */
     async addOrUpdateCustomerDetails(customerId: string, customerName: string, traits?: Map<string, string>) {
-        let validations = [];
+        const validations = [];
         if (!customerId.trim()) {
             validations.push(Errors.MISSING_CUSTOMER_ID);
         }
@@ -105,7 +105,7 @@ export class Metering {
         if (validations.length > 0) {
             throw new Error(`Invalid customer message: ${validations}`);
         }
-        let payload = new CustomerDetailsApiPayload(customerId, customerName, traits);
+        const payload = new CustomerDetailsApiPayload(customerId, customerName, traits);
         return this.customerDetailsApiClient.post(payload);
     }
 
@@ -121,7 +121,7 @@ export class Metering {
     }
 
     /**
-     * Shutdown the ingestion client. 
+     * Shutdown the ingestion client.
      */
     async shutdown() {
         if (!this.isStarted) {

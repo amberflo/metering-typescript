@@ -9,9 +9,9 @@ export class UsageClient {
 
     /**
      * Initialize a new `UsageClient` with API key
-     * @param {string} apiKey 
+     * @param {string} apiKey
      */
-    constructor(apiKey: string, debug: boolean = false) {
+    constructor(apiKey: string, debug = false) {
         this.signature = '[amberflo-metering UsageClient]:';
         this.apiKey = apiKey;
         this.debug = debug;
@@ -28,7 +28,7 @@ export class UsageClient {
 
     /**
      * Get usage data.
-     * @param {UsageApiPayload} payload 
+     * @param {UsageApiPayload} payload
      * @returns {Promise<UsageResult[]>}
      */
     async getUsage(payload: UsageApiPayload): Promise<any[]> {
@@ -36,7 +36,7 @@ export class UsageClient {
             if(this.debug){
                 console.log(new Date(), this.signature, 'calling Usage API', payload);
             }
-            let response = await this.axiosInstance.post('/usage', payload);
+            const response = await this.axiosInstance.post('/usage', payload);
             console.log(new Date(), this.signature, 'obtained result from Usage API', response.status);
             return response.data;
         }

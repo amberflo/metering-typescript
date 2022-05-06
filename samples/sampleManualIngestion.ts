@@ -4,15 +4,15 @@ import { FlushMode } from "../src/model/flushMode";
 import * as Constants from './sampleConstants';
 
 /**
- * This sample illustrates how to ingest your metering data into Amberflo with manual flushing. 
+ * This sample illustrates how to ingest your metering data into Amberflo with manual flushing.
  */
 export async function runIngest() {
-    //obtain your Amberflo API Key 
+    //obtain your Amberflo API Key
     const apiKey = Constants.apiKey;
 
     //optional ingest options
-    let ingestOptions = new IngestOptions();
-    //set flush mode manual to control when to ingest meter messages in the queue 
+    const ingestOptions = new IngestOptions();
+    //set flush mode manual to control when to ingest meter messages in the queue
     ingestOptions.flushMode = FlushMode.manual;
 
     const metering = new Metering(apiKey, false, ingestOptions);
@@ -28,7 +28,7 @@ export async function runIngest() {
 
     let j = 0;
     for (j = 0; j < 2; j++) {
-        let delay = new Promise(resolve => setTimeout(resolve, 100));
+        const delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
 
         //queue meter values for ingestion. To ingest messages in the queue, call flush. See below

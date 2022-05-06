@@ -10,9 +10,9 @@ export class ManualIngestClient implements IngestClient {
     signature: string;
     queue: Array<MeterMessage>;
     apiClient!: IngestApiClient;
-    debug: boolean = false;
+    debug = false;
 
-    constructor(apiKey: string, ingestOptions: IngestOptions, debug:boolean=false) {
+    constructor(apiKey: string, ingestOptions: IngestOptions, debug=false) {
         this.queue = [];
         this.apiKey = apiKey;
         this.signature = '[amberflo-metering SynchIngestClient]:';
@@ -37,12 +37,12 @@ export class ManualIngestClient implements IngestClient {
             return;
         }
 
-        let snapshot = this.queue.splice(0, this.queue.length);
+        const snapshot = this.queue.splice(0, this.queue.length);
         if (this.debug) {
             console.log(new Date(), this.signature, 'body', snapshot);
         }
 
-        let requestId = uuidv4();
+        const requestId = uuidv4();
         if (this.debug) {
             console.log(new Date(), this.signature, 'starting request', requestId);
         }

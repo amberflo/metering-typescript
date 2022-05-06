@@ -1,4 +1,3 @@
-
 export class TimeRange {
     startTimeInSeconds!: number;
     endTimeInSeconds?: number;

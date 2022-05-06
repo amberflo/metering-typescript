@@ -5,7 +5,7 @@ export class MeterMessage {
     meterApiName: string;
     customerId: string;
     meterValue: number;
-    meterTimeInMillis: number;    
+    meterTimeInMillis: number;
     dimensions!: any;
 
     constructor(meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions?: Map<string, string>) {
@@ -15,10 +15,10 @@ export class MeterMessage {
         this.meterTimeInMillis = meterTimeInMillis;
         this.customerId = customerId;
         if(dimensions){
-            this.dimensions = {};  
-            dimensions.forEach((value, key) => {  
-                this.dimensions[key] = value  
-            });  
+            this.dimensions = {};
+            dimensions.forEach((value, key) => {
+                this.dimensions[key] = value
+            });
         }
     }
 }
