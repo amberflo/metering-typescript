@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import axiosRetry from 'axios-retry';
 import { amberfloBaseUrl, userAgent } from './model/constants';
 
 export default class BaseClient {
@@ -17,8 +18,9 @@ export default class BaseClient {
      * @param {string} apiKey
      * @param {boolean} debug: Whether to issue debug level logs or not
      * @param {string} name: Name of the client
+     * @param {boolean} retry: Whether to retry the requests or not (see https://github.com/softonic/axios-retry)
      */
-    constructor(apiKey: string, debug: boolean, name: string) {
+    constructor(apiKey: string, debug: boolean, name: string, retry = false) {
         this.signature = `[amberflo-metering ${name}]:`;
         this.apiKey = apiKey;
         this.debug = debug;
@@ -32,6 +34,13 @@ export default class BaseClient {
             },
             timeout: 30000
         });
+
+        if (retry) {
+            axiosRetry(this.axiosInstance, {
+                retries: 3,
+                retryDelay: axiosRetry.exponentialDelay
+            });
+        }
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -56,11 +65,11 @@ export default class BaseClient {
         this.log('ERROR', message, ...args)
     }
 
-    async get<TResponse, TParams>(path: string, params: TParams): Promise<TResponse> {
+    async do_get<TResponse, TParams=void>(path: string, params?: TParams): Promise<TResponse> {
         const action = `GET ${path}`
         try {
             this.log_debug(action, params);
-            const response = await this.axiosInstance.get<TResponse>(path, { params });
+            const response = await this.axiosInstance.get<TResponse>(path, params ? { params } : undefined);
             this.log_info(action, response.status);
             return response.data
         }
@@ -70,11 +79,25 @@ export default class BaseClient {
         }
     }
 
-    async post<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
+    async do_post<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
         const action = `POST ${path}`
         try {
             this.log_debug(action, payload);
             const response = await this.axiosInstance.post<TResponse>(path, payload);
+            this.log_info(action, response.status);
+            return response.data
+        }
+        catch (error) {
+            this.log_error(action, error);
+            throw new Error(`${action} failed: ${error}`);
+        }
+    }
+
+    async do_put<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
+        const action = `PUT ${path}`
+        try {
+            this.log_debug(action, payload);
+            const response = await this.axiosInstance.put<TResponse>(path, payload);
             this.log_info(action, response.status);
             return response.data
         }
