@@ -1,5 +1,6 @@
 export * from './metering';
 export * from './usageClient';
+export * from './customerDetailsClient';
 
 //models
 export * from './model/ingestOptions';
