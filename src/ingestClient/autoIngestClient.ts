@@ -108,7 +108,7 @@ export class AutoIngestClient implements IngestClient {
                 }
             })
             .catch(error => {
-                console.log(new Date(), this.signature, 'waiting for all promises errored', error)
+                console.log(new Date(), this.signature, 'waiting for all promises errored', error);
             });
     }
 

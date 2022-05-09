@@ -17,6 +17,9 @@ module.exports = {
             "error", {"max": 2, "maxEOF": 0, "maxBOF": 0}
         ],
         "eol-last": ["error", "always"],
+        semi: ["error", "always", { "omitLastInOneLineBlock": true}],
+        "no-return-await": "error",
+        camelcase: "error",
     },
     overrides: [
         {

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import axiosRetry from 'axios-retry';
 import { amberfloBaseUrl, userAgent } from './model/constants';
 
 export default class BaseClient {
@@ -17,8 +18,9 @@ export default class BaseClient {
      * @param {string} apiKey
      * @param {boolean} debug: Whether to issue debug level logs or not
      * @param {string} name: Name of the client
+     * @param {boolean} retry: Whether to retry the requests or not (see https://github.com/softonic/axios-retry)
      */
-    constructor(apiKey: string, debug: boolean, name: string) {
+    constructor(apiKey: string, debug: boolean, name: string, retry = false) {
         this.signature = `[amberflo-metering ${name}]:`;
         this.apiKey = apiKey;
         this.debug = debug;
@@ -32,6 +34,13 @@ export default class BaseClient {
             },
             timeout: 30000
         });
+
+        if (retry) {
+            axiosRetry(this.axiosInstance, {
+                retries: 3,
+                retryDelay: axiosRetry.exponentialDelay
+            });
+        }
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -40,46 +49,63 @@ export default class BaseClient {
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    log_info(message: string, ...args: any[]) {
-        this.log('INFO', message, ...args)
+    logInfo(message: string, ...args: any[]) {
+        this.log('INFO', message, ...args);
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    log_debug(message: string, ...args: any[]) {
+    logDebug(message: string, ...args: any[]) {
         if (this.debug) {
-            this.log('DEBUG', message, ...args)
+            this.log('DEBUG', message, ...args);
         }
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    log_error(message: string, ...args: any[]) {
-        this.log('ERROR', message, ...args)
+    logError(message: string, ...args: any[]) {
+        this.log('ERROR', message, ...args);
     }
 
-    async get<TResponse, TParams>(path: string, params: TParams): Promise<TResponse> {
-        const action = `GET ${path}`
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async doGet<TResponse>(path: string, params?: any): Promise<TResponse> {
+        const action = `GET ${path}`;
         try {
-            this.log_debug(action, params);
-            const response = await this.axiosInstance.get<TResponse>(path, { params });
-            this.log_info(action, response.status);
-            return response.data
+            this.logDebug(action, params);
+            const response = await this.axiosInstance.get<TResponse>(path, params ? { params } : undefined);
+            this.logInfo(action, response.status);
+            return response.data;
         }
         catch (error) {
-            this.log_error(action, error);
+            this.logError(action, error);
             throw new Error(`${action} failed: ${error}`);
         }
     }
 
-    async post<TResponse, TPayload>(path: string, payload: TPayload): Promise<TResponse> {
-        const action = `POST ${path}`
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async doPost<TResponse>(path: string, payload: any, params?: any): Promise<TResponse> {
+        const action = `POST ${path}`;
         try {
-            this.log_debug(action, payload);
-            const response = await this.axiosInstance.post<TResponse>(path, payload);
-            this.log_info(action, response.status);
-            return response.data
+            this.logDebug(action, payload, params);
+            const response = await this.axiosInstance.post<TResponse>(path, payload, params ? { params } : undefined);
+            this.logInfo(action, response.status);
+            return response.data;
         }
         catch (error) {
-            this.log_error(action, error);
+            this.logError(action, error);
+            throw new Error(`${action} failed: ${error}`);
+        }
+    }
+
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    async doPut<TResponse>(path: string, payload: any): Promise<TResponse> {
+        const action = `PUT ${path}`;
+        try {
+            this.logDebug(action, payload);
+            const response = await this.axiosInstance.put<TResponse>(path, payload);
+            this.logInfo(action, response.status);
+            return response.data;
+        }
+        catch (error) {
+            this.logError(action, error);
             throw new Error(`${action} failed: ${error}`);
         }
     }
