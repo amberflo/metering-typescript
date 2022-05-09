@@ -7,7 +7,6 @@ import {
     AggregationType,
     AllUsageApiPayload,
     AllUsageGroupBy,
-    IUsageReport,
     TimeRange,
     UsageApiPayload,
     UsageClient,
@@ -18,6 +17,11 @@ import { apiKey } from './sampleConstants';
 
 // Let's be more verbose
 const debug = true;
+
+// Helper function
+function log<T>(data: T) {
+    console.log(JSON.stringify(data, undefined, 4));
+}
 
 export async function runUsage() {
     // 2. Initialize the usage client
@@ -32,7 +36,7 @@ export async function runUsage() {
 
     // 4. Example 1
 
-    // 4.1. Group by customers for a specific meter and all customers
+    // 4.1. Get overall usage report of a meter
     // To understand the payload, see: https://docs.amberflo.io/reference/post_usage
     const payload = new UsageApiPayload(
         'TypeScript-ApiCalls',
@@ -41,17 +45,14 @@ export async function runUsage() {
         timeRange,
     );
 
-    // Optional: group the result by customer
-    payload.groupBy = ["customerId"];
-
     // 4.2. Call the usage API
     // To understand the result, see: https://docs.amberflo.io/reference/post_usage
-    const result: IUsageReport = await client.getUsage(payload);
-    console.log(JSON.stringify(result, null, 4));
+    const result = await client.getUsage(payload);
+    log(result);
 
     // 5. Example 2
 
-    // 5.1 Filter for a meter for specific customer
+    // 5.1 Filter for a meter for a specific list of customers
     const payloadWithFilter = new UsageApiPayload(
         'TypeScript-ApiCalls',
         AggregationType.sum,
@@ -61,12 +62,12 @@ export async function runUsage() {
 
     // Optional: group the result by customer
     payloadWithFilter.groupBy = ["customerId"];
-    // Optional: Filter result for a specific customer by ID
+    // Optional: filter result for a specific customer by ID
     payloadWithFilter.filter = {customerId: ["123"]};
 
     // 5.2 Call the usage API
     const filteredResult = await client.getUsage(payloadWithFilter);
-    console.log(JSON.stringify(filteredResult, null, 4));
+    log(filteredResult);
 
     // 6. Example 3
 
@@ -80,8 +81,8 @@ export async function runUsage() {
     allUsagePayload.groupBy = AllUsageGroupBy.customerId;
 
     // 5.2 Call the usage API
-    const allUsageResult: IUsageReport[] = await client.getAllUsage(allUsagePayload);
-    console.log(JSON.stringify(allUsageResult, null, 4));
+    const allUsageResult = await client.getAllUsage(allUsagePayload);
+    log(allUsageResult);
 }
 
 runUsage();
