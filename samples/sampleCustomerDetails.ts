@@ -13,8 +13,8 @@ const debug = true;
 export async function runCustomerDetails() {
 
     // 2. Define some properties for this customer
-    const customerId = '123'
-    const customerName = 'Dell'
+    const customerId = '123';
+    const customerName = 'Dell';
     const traits = new Map<string, string>();
     traits.set("stripeId", "cus_AJ6bY3VqcaLAEs");
     traits.set("customerType", "Tech");
@@ -24,7 +24,7 @@ export async function runCustomerDetails() {
 
     // 4. Create or update the customer
     const customer = await metering.addOrUpdateCustomerDetails(customerId, customerName, traits);
-    console.log(customer)
+    console.log(customer);
 }
 
 runCustomerDetails();

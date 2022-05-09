@@ -18,7 +18,7 @@ export class UsageClient extends BaseClient {
      * @returns {Promise<UsageApiResult>}
      */
     async getUsage(query: UsageApiPayload): Promise<IUsageReport> {
-        query.validate()
+        query.validate();
         return await this.do_post<IUsageReport>('/usage', query);
     }
 
@@ -28,7 +28,7 @@ export class UsageClient extends BaseClient {
      * @returns {Promise<UsageApiResult[]>}
      */
     async getUsageBatch(queries: UsageApiPayload[]): Promise<IUsageReport[]> {
-        queries.forEach((q) => q.validate())
+        queries.forEach((q) => q.validate());
         return await this.do_post<IUsageReport[]>('/usage/batch', queries);
     }
 
@@ -38,7 +38,7 @@ export class UsageClient extends BaseClient {
      * @returns {Promise<UsageApiResult[]>}
      */
     async getAllUsage(query: AllUsageApiPayload): Promise<IUsageReport[]> {
-        query.validate()
+        query.validate();
         return await this.do_get<IUsageReport[]>('/usage/all', query);
     }
 }

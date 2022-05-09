@@ -28,7 +28,7 @@ export async function runUsage() {
     // Start time in seconds since the Unix Epoch (1970-01-01T00:00:00Z) and using UTC.
     // Here we get a start time for the last 24 hours
     const startTimeInSeconds = Math.ceil((new Date().getTime() - 24 * 60 * 60 * 1000) / 1000);
-    const timeRange = new TimeRange(startTimeInSeconds)
+    const timeRange = new TimeRange(startTimeInSeconds);
 
     // 4. Example 1
 
@@ -39,10 +39,10 @@ export async function runUsage() {
         AggregationType.sum,
         AggregationInterval.day,
         timeRange,
-    )
+    );
 
     // Optional: group the result by customer
-    payload.groupBy = ["customerId"]
+    payload.groupBy = ["customerId"];
 
     // 4.2. Call the usage API
     // To understand the result, see: https://docs.amberflo.io/reference/post_usage
@@ -57,12 +57,12 @@ export async function runUsage() {
         AggregationType.sum,
         AggregationInterval.day,
         timeRange,
-    )
+    );
 
     // Optional: group the result by customer
-    payloadWithFilter.groupBy = ["customerId"]
+    payloadWithFilter.groupBy = ["customerId"];
     // Optional: Filter result for a specific customer by ID
-    payloadWithFilter.filter = {customerId: ["123"]}
+    payloadWithFilter.filter = {customerId: ["123"]};
 
     // 5.2 Call the usage API
     const filteredResult = await client.getUsage(payloadWithFilter);
@@ -74,10 +74,10 @@ export async function runUsage() {
     const allUsagePayload = new AllUsageApiPayload(
         timeRange.startTimeInSeconds,
         AggregationInterval.day,
-    )
+    );
 
     // Optional: group the result by customer
-    allUsagePayload.groupBy = AllUsageGroupBy.customerId
+    allUsagePayload.groupBy = AllUsageGroupBy.customerId;
 
     // 5.2 Call the usage API
     const allUsageResult: IUsageReport[] = await client.getAllUsage(allUsagePayload);

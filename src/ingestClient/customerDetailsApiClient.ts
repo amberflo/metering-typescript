@@ -14,30 +14,30 @@ export class CustomerDetailsApiClient extends BaseClient {
     }
 
     async get(customerId: string): Promise<ICustomerDetails | NotFound> {
-        return await this.do_get<ICustomerDetails | NotFound>('/customers', { customerId })
+        return await this.do_get<ICustomerDetails | NotFound>('/customers', { customerId });
     }
 
     async add(payload: CustomerDetailsApiPayload, createInStripe = false): Promise<ICustomerDetails> {
-        payload.validate()
-        const params = createInStripe ? { autoCreateCustomerInStripe: true } : undefined
-        return await this.do_post<ICustomerDetails>('/customers', payload, params)
+        payload.validate();
+        const params = createInStripe ? { autoCreateCustomerInStripe: true } : undefined;
+        return await this.do_post<ICustomerDetails>('/customers', payload, params);
     }
 
     async update(payload: CustomerDetailsApiPayload): Promise<ICustomerDetails> {
-        payload.validate()
-        return await this.do_put<ICustomerDetails>('/customers', payload)
+        payload.validate();
+        return await this.do_put<ICustomerDetails>('/customers', payload);
     }
 
     async add_or_update(payload: CustomerDetailsApiPayload): Promise<ICustomerDetails> {
-        payload.validate()
-        const customer = await this.get(payload.customerId)
+        payload.validate();
+        const customer = await this.get(payload.customerId);
         if (customer.id) {
-            return await this.update(payload)
+            return await this.update(payload);
         } else {
-            return await this.add(payload)
+            return await this.add(payload);
         }
     }
 
     // for backwards compatibility
-    post = this.add_or_update
+    post = this.add_or_update;
 }

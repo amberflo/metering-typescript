@@ -17,7 +17,7 @@ export class MeterMessage {
         if(dimensions){
             this.dimensions = {};
             dimensions.forEach((value, key) => {
-                this.dimensions[key] = value
+                this.dimensions[key] = value;
             });
         }
     }
