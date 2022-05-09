@@ -22,10 +22,10 @@ export class CustomerProductPlanApiPayload implements IValidatable {
     }
 }
 
-export interface ICustomerProductPlan {
-    customerId: string
-    productPlanId: string
-    productId: string
-    startTimeInSeconds: number
-    endTimeInSeconds: number
+export class CustomerProductPlan {
+    customerId!: string;
+    productPlanId!: string;
+    productId!: string;
+    startTimeInSeconds!: number;
+    endTimeInSeconds!: number;
 }

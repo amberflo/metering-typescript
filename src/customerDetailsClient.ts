@@ -1,5 +1,5 @@
 import BaseClient from "./baseClient";
-import { CustomerDetailsApiPayload, ICustomerDetails } from './model/customerApiPayload';
+import { CustomerDetailsApiPayload, CustomerDetails } from './model/customerApiPayload';
 
 type NotFound = Record<string, never>
 
@@ -19,15 +19,15 @@ export class CustomerDetailsClient extends BaseClient {
     /**
      * List all customers.
      */
-    async list(): Promise<ICustomerDetails[]> {
-        return this.doGet<ICustomerDetails[]>('/customers');
+    async list(): Promise<CustomerDetails[]> {
+        return this.doGet<CustomerDetails[]>('/customers');
     }
 
     /**
      * Get customer by id.
      */
-    async get(customerId: string): Promise<ICustomerDetails | NotFound> {
-        return this.doGet<ICustomerDetails | NotFound>('/customers', { customerId });
+    async get(customerId: string): Promise<CustomerDetails | NotFound> {
+        return this.doGet<CustomerDetails | NotFound>('/customers', { customerId });
     }
 
     /**
@@ -35,10 +35,10 @@ export class CustomerDetailsClient extends BaseClient {
      * See: https://docs.amberflo.io/reference/post_customers
      * `createInStripe`: Whether or not to add create the customer in Stripe and add a `stripeId` trait to the customer.
      */
-    async add(payload: CustomerDetailsApiPayload, createInStripe = false): Promise<ICustomerDetails> {
+    async add(payload: CustomerDetailsApiPayload, createInStripe = false): Promise<CustomerDetails> {
         payload.validate();
         const params = createInStripe ? { autoCreateCustomerInStripe: true } : undefined;
-        return this.doPost<ICustomerDetails>('/customers', payload, params);
+        return this.doPost<CustomerDetails>('/customers', payload, params);
     }
 
     /**
@@ -46,16 +46,16 @@ export class CustomerDetailsClient extends BaseClient {
      * This has PUT semantics (i.e. it discards existing data).
      * See: https://docs.amberflo.io/reference/put_customers-customer-id
      */
-    async update(payload: CustomerDetailsApiPayload): Promise<ICustomerDetails> {
+    async update(payload: CustomerDetailsApiPayload): Promise<CustomerDetails> {
         payload.validate();
-        return this.doPut<ICustomerDetails>('/customers', payload);
+        return this.doPut<CustomerDetails>('/customers', payload);
     }
 
     /**
      * Convenience method. Performs a `get` followed by either `add` or `update`.
      * The update has PUT semantics (i.e. it discards existing data).
      */
-    async addOrUpdate(payload: CustomerDetailsApiPayload): Promise<ICustomerDetails> {
+    async addOrUpdate(payload: CustomerDetailsApiPayload): Promise<CustomerDetails> {
         payload.validate();
         const customer = await this.get(payload.customerId);
         if (customer.id) {
