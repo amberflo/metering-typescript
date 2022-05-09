@@ -18,6 +18,7 @@ module.exports = {
         ],
         "eol-last": ["error", "always"],
         semi: ["error", "always", { "omitLastInOneLineBlock": true}],
+        "no-return-await": "error",
     },
     overrides: [
         {
