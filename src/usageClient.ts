@@ -1,48 +1,44 @@
-import axios, { AxiosInstance } from "axios";
-import { UsageApiPayload } from "./model/usageApiPayload";
+import BaseClient from "./baseClient";
+import { UsageApiPayload, AllUsageApiPayload, IUsageReport } from "./model/usageApiPayload";
 
-export class UsageClient {
-    apiKey: string;
-    axiosInstance: AxiosInstance;
-    signature: string;
-    debug: boolean;
+export class UsageClient extends BaseClient {
 
     /**
-     * Initialize a new `UsageClient` with API key
+     * Initialize a new `UsageClient`
      * @param {string} apiKey
+     * @param {boolean} debug: Whether to issue debug level logs or not
      */
     constructor(apiKey: string, debug = false) {
-        this.signature = '[amberflo-metering UsageClient]:';
-        this.apiKey = apiKey;
-        this.debug = debug;
-        this.axiosInstance = axios.create({
-            baseURL: 'https://app.amberflo.io',
-            responseType: 'json',
-            headers: {
-                "X-API-KEY": this.apiKey,
-                "Content-Type": "application/json"
-            },
-            timeout: 30000
-        });
+        super(apiKey, debug, 'UsageClient');
     }
 
     /**
-     * Get usage data.
-     * @param {UsageApiPayload} payload
-     * @returns {Promise<UsageResult[]>}
+     * Get usage data
+     * @param {UsageApiPayload} query
+     * @returns {Promise<UsageApiResult>}
      */
-    async getUsage(payload: UsageApiPayload): Promise<any[]> {
-        try {
-            if(this.debug){
-                console.log(new Date(), this.signature, 'calling Usage API', payload);
-            }
-            const response = await this.axiosInstance.post('/usage', payload);
-            console.log(new Date(), this.signature, 'obtained result from Usage API', response.status);
-            return response.data;
-        }
-        catch (error) {
-            console.log(new Date(), this.signature, 'call to Usage API failed', error);
-            throw new Error(`Calling Usage API failed: ${error}`);
-        }
+    async getUsage(query: UsageApiPayload): Promise<IUsageReport> {
+        query.validate()
+        return await this.post<IUsageReport, UsageApiPayload>('/usage', query);
+    }
+
+    /**
+     * Get usage data, in batch
+     * @param {UsageApiPayload[]} query
+     * @returns {Promise<UsageApiResult[]>}
+     */
+    async getUsageBatch(queries: UsageApiPayload[]): Promise<IUsageReport[]> {
+        queries.forEach((q) => q.validate())
+        return await this.post<IUsageReport[], UsageApiPayload[]>('/usage/batch', queries);
+    }
+
+    /**
+     * Get usage data for all meters
+     * @param {AllUsageApiPayload} query
+     * @returns {Promise<UsageApiResult[]>}
+     */
+    async getAllUsage(query: AllUsageApiPayload): Promise<IUsageReport[]> {
+        query.validate()
+        return await this.get<IUsageReport[], AllUsageApiPayload>('/usage/all', query);
     }
 }
