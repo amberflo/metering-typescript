@@ -26,14 +26,14 @@ export class CustomerDetailsApiPayload implements IValidatable {
     }
 }
 
-export interface ICustomerDetails {
-    customerId: string
-    customerName: string
-    customerEmail?: string
-    enabled?: boolean
-    traits?: { [key: string]: string }
+export class CustomerDetails {
+    customerId!: string;
+    customerName!: string;
+    customerEmail?: string;
+    enabled?: boolean;
+    traits?: { [key: string]: string };
 
-    id: string
-    createTime: number
-    updateTime: number
+    id!: string;
+    createTime!: number;
+    updateTime!: number;
 }

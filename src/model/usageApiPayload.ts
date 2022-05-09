@@ -102,25 +102,25 @@ export class AllUsageApiPayload implements IValidatable {
     }
 }
 
-interface IAggregationValue {
-    value: number
-    secondsSinceEpochUtc: number
-    percentageFromPrevious: number
+class AggregationValue {
+    value!: number;
+    secondsSinceEpochUtc!: number;
+    percentageFromPrevious!: number;
 }
 
-interface IAggregationGroup {
-    groupInfo: { [key: string]: string }
+class AggregationGroup {
+    groupInfo!: { [key: string]: string };
 }
 
-interface IAggregation {
-    group?: IAggregationGroup
-    groupValue: number
-    values: IAggregationValue[]
-    percentageFromPrevious: number
+class Aggregation {
+    group?: AggregationGroup;
+    groupValue!: number;
+    values!: AggregationValue[];
+    percentageFromPrevious!: number;
 }
 
-export interface IUsageReport {
-    metadata: UsageApiPayload
-    secondsSinceEpochIntervals: number[]
-    clientMeters: IAggregation[]
+export class UsageReport {
+    metadata!: UsageApiPayload;
+    secondsSinceEpochIntervals!: number[];
+    clientMeters!: Aggregation[];
 }
