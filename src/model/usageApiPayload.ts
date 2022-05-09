@@ -109,9 +109,11 @@ interface IAggregationValue {
 }
 
 interface IAggregationGroup {
-    group?: {
-        groupInfo?: { [key: string]: string }
-    }
+    groupInfo: { [key: string]: string }
+}
+
+interface IAggregation {
+    group?: IAggregationGroup
     groupValue: number
     values: IAggregationValue[]
     percentageFromPrevious: number
@@ -120,5 +122,5 @@ interface IAggregationGroup {
 export interface IUsageReport {
     metadata: UsageApiPayload
     secondsSinceEpochIntervals: number[]
-    clientMeters: IAggregationGroup[]
+    clientMeters: IAggregation[]
 }
