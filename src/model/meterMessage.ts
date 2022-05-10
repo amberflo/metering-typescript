@@ -6,7 +6,7 @@ export class MeterMessage {
     customerId: string;
     meterValue: number;
     meterTimeInMillis: number;
-    dimensions!: any;
+    dimensions!: { [key: string]: string };
 
     constructor(meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions?: Map<string, string>) {
         this.uniqueId = v1();
