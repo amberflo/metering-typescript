@@ -102,7 +102,7 @@ export class AutoIngestClient implements IngestClient {
         }
         return Promise
             .all(this.promises.values())
-            .then(values => {
+            .then(() => {
                 if(this.debug){
                     console.log(new Date(), this.signature, 'all pending requests completed');
                 }
