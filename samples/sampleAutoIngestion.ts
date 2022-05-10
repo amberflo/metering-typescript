@@ -1,6 +1,6 @@
 import { IngestOptions, Metering } from "../src";
 import { FlushMode } from "../src/model/flushMode";
-import * as Constants from './sampleConstants';
+import * as Constants from './configuration';
 
 /**
  * This sample illustrates how to ingest your metering data into Amberflo in auto flush mode.
