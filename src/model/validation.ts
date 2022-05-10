@@ -29,6 +29,13 @@ function positiveInteger(name: string, value: number | null | undefined, nullabl
     }
 }
 
+function positiveNumber(name: string, value: number | null | undefined, nullable = true) {
+    if (!nullable) required(name, value);
+    if (isSet(value)) {
+        if (value <= 0) throw new Error(`Field ${name} must be greater than 0`);
+    }
+}
+
 function nonEmptyStr(name: string, value: string | null | undefined, nullable = true) {
     if (!nullable) required(name, value);
     if (isSet(value)) {
@@ -62,6 +69,7 @@ export const validators = {
     required,
     valid,
     positiveInteger,
+    positiveNumber,
     nonEmptyStr,
     nonEmptyStrMap,
     nonEmptyList,
