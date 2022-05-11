@@ -6,8 +6,8 @@ import { CustomerProductPlanApiPayload, CustomerProductPlan } from "./model/cust
  */
 export class CustomerProductPlanClient extends BaseClient {
 
-    private path = "/payments/pricing/amberflo/customer-pricing";
-    private pathAll = this.path + "/list";
+    private readonly path = "/payments/pricing/amberflo/customer-pricing";
+    private readonly pathAll = this.path + "/list";
 
     /**
      * Initialize a new `CustomerProductPlanClient`

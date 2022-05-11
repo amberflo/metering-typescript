@@ -11,8 +11,8 @@ import {
  */
 export class CustomerProductInvoiceClient extends BaseClient {
 
-    path = "/payments/billing/customer-product-invoice";
-    pathAll = this.path + "/all";
+    private readonly path = "/payments/billing/customer-product-invoice";
+    private readonly pathAll = this.path + "/all";
 
     /**
      * Initialize a new `CustomerProductInvoiceClient`

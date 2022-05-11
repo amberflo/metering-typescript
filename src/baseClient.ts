@@ -8,6 +8,8 @@ export default class BaseClient {
      * logging.
      */
 
+    // These should be `readonly`, maybe even `private`, but are not for
+    // backwards compatibility.
     apiKey: string;
     axiosInstance: AxiosInstance;
     signature: string;
