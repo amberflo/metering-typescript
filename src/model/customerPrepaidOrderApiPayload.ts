@@ -1,11 +1,6 @@
 import { IValidatable, INestedValidatable, validators } from './validation';
 import { defaultProductId, defaultOfferVersion } from './constants';
-
-export enum BillingPeriodInterval {
-    day = "day",
-    month = "month",
-    year = "year",
-}
+import { BillingPeriodInterval, PaymentStatus } from './payments';
 
 export class BillingPeriod implements INestedValidatable {
     interval!: BillingPeriodInterval;
@@ -51,16 +46,6 @@ export class CustomerPrepaidOrderApiPayload implements IValidatable {
         this.prepaidOfferVersion ||= defaultOfferVersion;
         this.productId ||= defaultProductId;
     }
-}
-
-enum PaymentStatus {
-    prePayment = "pre_payment",
-    requiresAction = "requires_action",
-    pending = "pending",
-    failed = "failed",
-    settled = "settled",
-    notNeeded = "not_needed",
-    unknown = "unknown",
 }
 
 export class CustomerPrepaidOrder {
