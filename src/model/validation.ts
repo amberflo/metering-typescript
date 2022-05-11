@@ -39,7 +39,7 @@ function positiveNumber(name: string, value: number | null | undefined, nullable
 function nonEmptyStr(name: string, value: string | null | undefined, nullable = true) {
     if (!nullable) required(name, value);
     if (isSet(value)) {
-        if (value.length <= 0) throw new Error(`Field ${name} may not be an empty string`);
+        if (value.trim().length <= 0) throw new Error(`Field ${name} may not be an empty string`);
     }
 }
 
