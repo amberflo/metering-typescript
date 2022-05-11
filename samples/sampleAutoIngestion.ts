@@ -1,52 +1,59 @@
-import { IngestOptions, Metering } from "../src";
-import { FlushMode } from "../src/model/flushMode";
-import * as Constants from './configuration';
-
 /**
  * This sample illustrates how to ingest your metering data into Amberflo in auto flush mode.
  * Auto is the default mode.
  */
-export async function runIngest() {
-    //obtain your Amberflo API Key
-    const apiKey = Constants.apiKey;
 
-    //optional ingest options
+import { apiKey, debug } from './configuration';
+
+import { IngestOptions, Metering, FlushMode } from "../src";
+
+export async function run() {
+    // 1. Instantiate metering client
+
+    // Optional: Select ingest options
     const ingestOptions = new IngestOptions();
-    //set flush mode to auto. This is also the default, so this step is optional.
+
+    // Set flush mode to auto. This is also the default, so this is optional.
     ingestOptions.flushMode = FlushMode.auto;
-    //Number of messages posted to the API. Default is 100.
+
+    // Number of messages posted to the API at a time. Default is 100.
     ingestOptions.batchSize = 20;
-    //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
+
+    // Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
     ingestOptions.frequencyMillis = 3000;
 
-    const metering = new Metering(apiKey, false, ingestOptions);
+    const metering = new Metering(apiKey, debug, ingestOptions);
 
-    //initialize and start the ingestion client
+    // 2. Initialize and start the ingestion client
     metering.start();
 
-    //define dimesions for your meters
+    // Optional: Define dimesions for your meters
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
     dimensions.set("customerType", "Tech");
 
-    let j = 0;
-    for (j = 0; j < 50; j++) {
+    for (let j = 0; j < 50; j++) {
         const delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
 
-        //Queue meter messages for ingestion.
-        //In auto flush mode, queue will be flushed when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis
-        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
+        // 3. Queue meter messages for ingestion.
+        //
+        // In auto flush mode, queue will be flushed when
+        // `ingestOptions.batchSize` is exceeded or periodically every
+        // `ingestOptions.frequencyMillis`
+        //
+        // Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
     }
 
-    //wait for messages and requests to API to complete
+    // 4. Wait for messages and requests to API to complete
     await metering.flush();
-    //perform graceful shutdown, flush, stop the timer
+
+    // 5. Perform graceful shutdown, flush, stop the timer
     await metering.shutdown();
 }
 
-runIngest();
+run();
