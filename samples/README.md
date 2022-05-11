@@ -9,6 +9,8 @@ the repo).
 
 Then add your API key to `./configuration.ts`.
 
+To disable the `debug` logging, change `debug` to `false` in `./configuration.ts`.
+
 Finally, run:
 ```
 npx ts-node <sample-script>
