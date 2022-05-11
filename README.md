@@ -9,199 +9,199 @@
     </a>
 </p>
 
-# Download and Install
-```sh
-npm install amberflo-metering-typescript
-```
-Package homepage: https://www.npmjs.com/package/amberflo-metering-typescript
+[Amberflo](https://amberflo.io) is the simplest way to integrate metering into your application.
 
-# Sample ingestion code with auto flush mode
+This is the official TypeScript client that wraps the [Amberflo REST API](https://docs.amberflo.io/docs).
+
+## :heavy_check_mark: Features
+
+- Add and update customers
+- Assign and update product plans to customers
+- List invoices of a customer
+- Get a new customer portal session for a customer
+- Add and list prepaid orders to customers
+- Send meter events in asynchronous batches for high throughput (with optional flush on demand)
+- Query usage
+
+## :rocket: Quick Start
+
+1. [Sign up for free](https://ui.amberflo.io/) and get an API key.
+
+2. Install the SDK
+
+```
+npm install --save amberflo-metering-typescript
+```
+
+3. Create a customer
+
+```typescript
+import { CustomerDetailsClient, CustomerDetailsApiPayload } from "amberflo-metering-typescript";
+
+// 1. Define some properties for this customer
+const customerId = '123';
+const customerName = 'Dell';
+const traits = new Map<string, string>();
+traits.set("customerType", "Tech");
+
+// 2. Initialize metering client
+const client = new CustomerDetailsClient(apiKey, debug);
+
+// 3. Create or update the customer
+const payload = new CustomerDetailsApiPayload(customerId, customerName, traits);
+const createInStripe = true;
+const customer = await client.add(payload, createInStripe);
+```
+
+4. Ingest meter events
+
 ```typescript
 import { IngestOptions, Metering, FlushMode } from "amberflo-metering-typescript";
 
-/**
- * This sample illustrates how to ingest your metering data into Amberflo in auto flush mode.
- * Auto is the default mode.
- */
-export async function runIngest() {
-    //obtain your Amberflo API Key
-    const apiKey = 'my-api-key';
+// 1. Instantiate metering client
+const ingestOptions = new IngestOptions();
+ingestOptions.flushMode = FlushMode.auto;
+ingestOptions.batchSize = 20;
+ingestOptions.frequencyMillis = 3000;
 
-    //optional ingest options
-    const ingestOptions = new IngestOptions();
-    //set flush mode to auto. This is also the default, so this step is optional.
-    ingestOptions.flushMode = FlushMode.auto;
-    //Number of messages posted to the API. Default is 100.
-    ingestOptions.batchSize = 20;
-    //Frequency at which queued data will be sent to API. Default is 1000 milliseconds.
-    ingestOptions.frequencyMillis = 3000;
-    //Set to true to log debug statements
-    const debug = false;
+const metering = new Metering('my-api-key', false, ingestOptions);
 
-    const metering = new Metering(apiKey, debug, ingestOptions);
+// 2. Initialize and start the ingestion client
+metering.start();
 
-    //initialize and start the ingestion client
-    metering.start();
+// Optional: Define dimesions for your meters
+const dimensions = new Map<string, string>();
+dimensions.set("region", "Midwest");
+dimensions.set("customerType", "Tech");
 
-    //define dimesions for your meters
-    const dimensions = new Map<string, string>();
-    dimensions.set("region", "Midwest");
-    dimensions.set("customerType", "Tech");
+// 3. Queue meter messages for ingestion.
+metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
 
-    for (let j = 0; j < 50; j++) {
-        const delay = new Promise(resolve => setTimeout(resolve, 100));
-        await delay;
-
-        //Queue meter messages for ingestion.
-        //In auto flush mode, queue will be flushed when ingestOptions.batchSize is exceeded or periodically ingestOptions.frequencyMillis
-        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
-    }
-
-    //wait for messages and requests to API to complete
-    await metering.flush();
-    //perform graceful shutdown, flush, stop the timer
-    await metering.shutdown();
-}
-
-runIngest();
+// 4. Perform graceful shutdown, flush, stop the timer
+await metering.shutdown();
 ```
 
-# Sample Usage SDK code
+5. Query usage
+
 ```typescript
-import { UsageClient, UsageApiPayload, AggregationType, AggregationInterval, TimeRange } from "amberflo-metering-typescript";
+import {
+    AggregationInterval, AggregationType, TimeRange, UsageApiPayload, UsageClient,
+} from "amberflo-metering-typescript";
 
-export async function runUsage() {
-    //obtain your Amberflo API Key
-    const apiKey = 'my-api-key';
-    //Set to true to log debug statements
-    const debug = false;
+// 1. Initialize the usage client
+const client = new UsageClient(apiKey, debug);
 
-    //initialize the usage client
-    const client = new UsageClient(apiKey, debug);
+// 2. Define a time range
+const startTimeInSeconds = Math.ceil((new Date().getTime() - 24 * 60 * 60 * 1000) / 1000);  // two days ago
+const timeRange = new TimeRange(startTimeInSeconds);
 
-    // start date time represented as seconds since the Unix Epoch (1970-01-01T00:00:00Z) and using UTC.
-    // following is Start time for last 24 hours
-    const startTimeInSeconds = Math.ceil(((new Date().getTime()) - (24 * 60 * 60 * 1000)) / 1000);
-
-    let timeRange = new TimeRange();
-    timeRange.startTimeInSeconds = startTimeInSeconds;
-
-    // Example 1: group by customers for a specific meter and all customers
-    // setup usage query params
-    // visit following link for description of payload:
-    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
-    let payload = new UsageApiPayload();
-    payload.meterApiName = 'TypeScript-ApiCalls';
-    payload.aggregation = AggregationType.sum;
-    payload.timeGroupingInterval = AggregationInterval.day;
-    //optional: group the result by customer
-    payload.groupBy = ["customerId"];
-    payload.timeRange = timeRange;
-
-    //Call the usage API
-    let jsonResult = await client.getUsage(payload);
-    // To understand the API response, visit following link:
-    // https://amberflo.readme.io/docs/getting-started-sample-data#query-the-usage-data
-    console.log(JSON.stringify(jsonResult, null, 4));
-
-    //Example 2: filter for a meter for specific customer
-    //setup usage query params
-    let payloadForFilteredCustomer = new UsageApiPayload();
-    payloadForFilteredCustomer.meterApiName = 'TypeScript-ApiCalls';
-    payloadForFilteredCustomer.aggregation = AggregationType.sum;
-    payloadForFilteredCustomer.timeGroupingInterval = AggregationInterval.day;
-    //optional: group the result by customer
-    payloadForFilteredCustomer.groupBy = ["customerId"];
-    //Filter result for a specific customer by ID
-    payloadForFilteredCustomer.filter = {customerId: ["123"]};
-    payloadForFilteredCustomer.timeRange = timeRange;
-
-    //Call the usage API
-    let jsonResultForFilteredCustomer = await client.getUsage(payloadForFilteredCustomer);
-    console.log(JSON.stringify(jsonResultForFilteredCustomer, null, 4));
-}
-
-runUsage();
+// 3. Get overall usage report of a meter
+const payload = new UsageApiPayload(
+    'TypeScript-ApiCalls',
+    AggregationType.sum,
+    AggregationInterval.day,
+    timeRange,
+);
+const result = await client.getUsage(payload);
 ```
 
-# Sample ingestion code with manual flush mode
+## :zap: High throughput ingestion
+
+Amberflo.io libraries are built to support high throughput environments. That
+means you can safely send hundreds of meter records per second. For example,
+you can chose to deploy it on a web server that is serving hundreds of requests
+per second.
+
+However, every call does not result in a HTTP request, but is queued in memory
+instead. Messages are batched and flushed in the background, allowing for much
+faster operation. The size of batch and rate of flush can be customized.
+
+**Automatic flush:** When operating with auto flush mode, which is the default,
+the messages will accumulate in the queue until either the batch size is
+reached or some period of time elapses. When either happens, the batch is sent.
+
+**Flush on demand:** For example, at the end of your program, you'll want to
+flush to make sure there's nothing left in the queue. Calling this method will
+block the calling thread until there are no messages left in the queue. So,
+you'll want to use it as part of your cleanup scripts and avoid using it as
+part of the request lifecycle.
+
+## :book: Documentation
+
+General documentation on how to use Amberflo is available at [Product Walkthrough](https://docs.amberflo.io/docs/product-walkthrough).
+
+The full REST API documentation is available at [API Reference](https://docs.amberflo.io/reference).
+
+## :scroll: Samples
+
+Code samples covering different scenarios are available in the [TypeScript samples](https://github.com/amberflo/metering-typescript-samples) repository.
+
+## :bookmark_tabs: Reference
+
+### API Clients
+
+#### [Ingest](https://docs.amberflo.io/reference/post_ingest)
+
 ```typescript
 import { IngestOptions, Metering, FlushMode } from "amberflo-metering-typescript";
-
-/**
- * This sample illustrates how to ingest your metering data into Amberflo with manual flushing.
- */
-export async function runIngest() {
-    //obtain your Amberflo API Key
-    const apiKey = 'my-api-key';
-    //Set to true to log debug statements
-    const debug = false;
-
-    //optional ingest options
-    let ingestOptions = new IngestOptions();
-    //set flush mode manual to control when to ingest meter messages in the queue
-    ingestOptions.flushMode = FlushMode.manual;
-
-    const metering = new Metering(apiKey, debug, ingestOptions);
-
-    //initialize and start the ingestion client
-    metering.start();
-
-    //define dimesions for your meters
-    //dimensions are optional
-    const dimensions = new Map<string, string>();
-    dimensions.set("region", "Midwest");
-    dimensions.set("customerType", "Tech");
-
-    for (let j = 0; j < 2; j++) {
-        const delay = new Promise(resolve => setTimeout(resolve, 100));
-        await delay;
-
-        //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
-        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
-        metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
-        metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
-        console.log(new Date(), 'manually flushing the queue ... ');
-
-        //manual flush, ingest all queued meter messages and send to API
-        await metering.flush();
-    }
-
-    await metering.shutdown();
-}
-
-runIngest();
 ```
 
-# Setup Customer Details
+#### [Customer](https://docs.amberflo.io/reference/post_customers)
 
-```TypeScript
-import { Metering } from "amberflo-metering-typescript";
+```typescript
+import { CustomerDetailsClient, CustomerDetailsApiPayload } from "amberflo-metering-typescript";
+```
 
-/**
- * This sample illustrates how to setup customer details.
- */
-export async function runCustomerDetails() {
-    //obtain your Amberflo API Key
-    const apiKey = 'my-api-key';
-    //Set to true to log debug statements
-    const debug = false;
+#### [Usage](https://docs.amberflo.io/reference/post_usage)
 
-    const traits = new Map<string, string>();
-    traits.set("stripeId", "cus_AJ6bY3VqcaLAEs");
-    traits.set("customerType", "Tech");
+```typescript
+import {
+    AggregationInterval,
+    AggregationType,
+    AllUsageApiPayload,
+    AllUsageGroupBy,
+    TimeRange,
+    UsageApiPayload,
+    UsageClient,
+} from "amberflo-metering-typescript";
+```
 
-    const metering = new Metering(apiKey, debug);
-    await metering.addOrUpdateCustomerDetails('123', 'Dell', traits);
+#### [Customer Portal Session](https://docs.amberflo.io/reference/post_session)
 
-    console.log('customer setup completed!');
-}
+```typescript
+import {
+    CustomerPortalSessionClient,
+    CustomerPortalSessionApiPayload
+} from "amberflo-metering-typescript"
+```
 
-runCustomerDetails();
+#### [Customer Prepaid Order](https://docs.amberflo.io/reference/post_payments-pricing-amberflo-customer-prepaid)
+
+```typescript
+import {
+    CustomerPrepaidOrderClient,
+    CustomerPrepaidOrderApiPayload,
+    BillingPeriod,
+    BillingPeriodInterval,
+} from "amberflo-metering-typescript";
+```
+
+#### [Customer Product Invoice](https://docs.amberflo.io/reference/get_payments-billing-customer-product-invoice)
+
+```typescript
+import {
+    AllInvoicesQuery,
+    LatestInvoiceQuery,
+    InvoiceQuery,
+    CustomerProductInvoiceClient,
+} from "amberflo-metering-typescript";
+```
+
+#### [Customer Product Plan](https://docs.amberflo.io/reference/post_payments-pricing-amberflo-customer-pricing)
+
+```typescript
+import {
+    CustomerProductPlanClient,
+    CustomerProductPlanApiPayload,
+} from "amberflo-metering-typescript";
 ```
