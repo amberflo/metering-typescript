@@ -134,7 +134,7 @@ The full REST API documentation is available at [API Reference](https://docs.amb
 
 ## :scroll: Samples
 
-Code samples covering different scenarios are available in the [TypeScript samples](https://github.com/amberflo/metering-typescript-samples) repository.
+Code samples covering different scenarios are available in the [samples](https://github.com/amberflo/metering-typescript/tree/master/samples) folder.
 
 ## :bookmark_tabs: Reference
 

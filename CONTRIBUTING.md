@@ -16,32 +16,6 @@ npm run test
 
 You can also run the [provided samples](./samples/README.md).
 
-### Testing with the [Samples Repo](https://github.com/amberflo/metering-typescript-sample)
-
-At the root of *this repo*, create a "link" to this repo (your development
-version of the package). You may need `sudo`.
-```
-npm run build
-npm link
-```
-
-At the root of the *samples repo*, use the development version of your library:
-```
-npm install
-npm link amberflo-metering-typescript
-```
-
-Then, set up the samples and run one of them:
-```
-npx tsc
-node ./dist/sampleUsageSdk.js
-```
-
-It should use your development version of this library.
-
-Note that you need to `npm run build` this library in order for your changes to
-take effect.
-
 ## Linting & Checking
 
 Lint the codebase:
@@ -77,3 +51,42 @@ To build the release version:
 ```
 npm run build
 ```
+
+## Testing the release build
+
+The sample code references the library using `../src`, which is not how it's
+gonna be used in a "real-project".
+
+To test in a more "real-project" setting using the samples, you can create a
+package and use `npm link` to link to the "development release".
+
+1. At the root of this repo, create the release build:
+```
+npm run build
+```
+
+2. At the root of this repo, create a "link" to this repo (your development
+version of the package). You may need `sudo` on the second command.
+```
+npm link
+```
+
+3. Change to the `samples` folder and make the samples use the built library
+   instead of the source code.
+```
+cd ./samples
+sed -i -e 's|\.\./src|amberflo-metering-typescript|' *.ts
+echo '{}' > package.json
+npm install --save amberflo-metering-typescript ts-node
+npm link amberflo-metering-typescript
+```
+
+4. Run a sample
+```
+npx ts-node <sample-script>
+```
+
+Make sure to not commit the changes from **3.**.
+
+Note that you need to `npm run build` this library in order for your changes to
+the source code to take effect.
