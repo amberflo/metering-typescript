@@ -9,11 +9,11 @@ type NotFound = Record<string, never>
 export class CustomerDetailsClient extends BaseClient {
 
     /**
-     * Initialize a new `CustomerDetailsApiClient`
+     * Initialize a new `CustomerDetailsClient`
      * `debug`: Whether to issue debug level logs or not.
      */
     constructor(apiKey: string, debug = false) {
-        super(apiKey, debug, 'CustomerDetailsApiClient', true);
+        super(apiKey, debug, 'CustomerDetailsClient', true);
     }
 
     /**
@@ -65,6 +65,11 @@ export class CustomerDetailsClient extends BaseClient {
         }
     }
 
-    // for backwards compatibility
+    /**
+     * Convenience method. Performs a `get` followed by either `add` or `update`.
+     * The update has PUT semantics (i.e. it discards existing data).
+     *
+     * This method is provided for backward compatibility. Please prefer using the `.addOrUpdate()` one instead.
+     */
     post = this.addOrUpdate;
 }

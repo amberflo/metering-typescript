@@ -9,6 +9,7 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist/*"],
   "scripts": {
     "fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
