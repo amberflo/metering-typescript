@@ -1,49 +1,52 @@
-import { IngestOptions } from "../src/model/ingestOptions";
-import { Metering } from "../src/metering";
-import { FlushMode } from "../src/model/flushMode";
-import * as Constants from './sampleConstants';
-
 /**
- * This sample illustrates how to ingest your metering data into Amberflo with manual flushing.
+ * This sample illustrates how to ingest your metering data into Amberflo in manual flush mode.
+ * Note that the default mode is auto.
  */
-export async function runIngest() {
-    //obtain your Amberflo API Key
-    const apiKey = Constants.apiKey;
 
-    //optional ingest options
+import { apiKey, debug } from './configuration';
+
+import { IngestOptions, Metering, FlushMode } from "../src";
+
+export async function run() {
+    // 1. Instantiate metering client
+
+    // Select ingest options
     const ingestOptions = new IngestOptions();
-    //set flush mode manual to control when to ingest meter messages in the queue
+
+    // Set flush mode to manual.
     ingestOptions.flushMode = FlushMode.manual;
 
-    const metering = new Metering(apiKey, false, ingestOptions);
+    const metering = new Metering(apiKey, debug, ingestOptions);
 
-    //initialize and start the ingestion client
+    // 2. Initialize and start the ingestion client
     metering.start();
 
-    //define dimesions for your meters
-    //dimensions are optional
+    // Optional: Define dimesions for your meters
     const dimensions = new Map<string, string>();
     dimensions.set("region", "Midwest");
     dimensions.set("customerType", "Tech");
 
-    let j = 0;
-    for (j = 0; j < 2; j++) {
+    for (let j = 0; j < 2; j++) {
         const delay = new Promise(resolve => setTimeout(resolve, 100));
         await delay;
 
-        //queue meter values for ingestion. To ingest messages in the queue, call flush. See below
-        //Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
+        // 3. Queue meter messages for ingestion.
+        //
+        // To ingest messages in the queue, call flush. See below.
+        //
+        // Params: meterApiName: string, meterValue: number, meterTimeInMillis: number, customerId: string, dimensions: Map<string, string>
         metering.meter("TypeScript-ApiCalls", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Bandwidth", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-Transactions", j + 1, Date.now(), "123", dimensions);
         metering.meter("TypeScript-CPU", j + 1, Date.now(), "123", dimensions);
-        console.log(new Date(), 'manually flushing the queue ... ');
 
-        //manual flush, ingest all queued meter messages and send to API
+        // 4. Manual flush, ingest all queued meter messages and send to API
+        console.log(new Date(), 'manually flushing the queue ... ');
         await metering.flush();
     }
 
+    // 5. Perform graceful shutdown
     await metering.shutdown();
 }
 
-runIngest();
+run();

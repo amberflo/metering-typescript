@@ -7,7 +7,9 @@ In this folder you can find many examples of how to use this SDK.
 First make sure you installed the dependencies (`npm install` on the root of
 the repo).
 
-Then add your API key to `./sampleConstants.ts`.
+Then add your API key to `./configuration.ts`.
+
+To disable the `debug` logging, change `debug` to `false` in `./configuration.ts`.
 
 Finally, run:
 ```

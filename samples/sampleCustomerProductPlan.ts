@@ -2,31 +2,27 @@
  * This sample illustrates how to set a customer's product plan
  */
 
-import BaseClient from "../src/baseClient";
-import { CustomerProductPlanClient, CustomerDetailsClient, CustomerProductPlanApiPayload } from "../src";
+import { apiKey, debug } from './configuration';
+import { getCustomerId, getProductPlanId } from './utils';
 
-// 1. Obtain your Amberflo API key
-import { apiKey } from './sampleConstants';
-
-// Let's be more verbose
-const debug = true;
+import {
+    CustomerProductPlanClient,
+    CustomerProductPlanApiPayload,
+} from "../src";
 
 export async function run() {
+    // 1. Select a customer
+    const customerId = await getCustomerId();
 
-    // 2. Select a customer
-    const customerClient = new CustomerDetailsClient(apiKey, debug);
-    const customer = (await customerClient.list())[0];
+    // 2. Select a product plan
+    const productPlanId = await getProductPlanId();
 
-    // 3. Select a product plan
-    const baseClient = new BaseClient(apiKey, debug, 'BaseClient');
-    const productPlan = (await baseClient.doGet<{ id: string }[]>('/payments/pricing/amberflo/account-pricing/product-plans/list'))[0];
+    // 3. Assign product plan to customer
+    const client = new CustomerProductPlanClient(apiKey, debug);
 
-    // 4. Assign product plan to customer
-    const customerProductPlanClient = new CustomerProductPlanClient(apiKey, debug);
+    const payload = new CustomerProductPlanApiPayload(customerId, productPlanId);
 
-    const payload = new CustomerProductPlanApiPayload(customer.customerId, productPlan.id);
-
-    const newCustomerProductPlan = await customerProductPlanClient.addOrUpdate(payload);
+    const newCustomerProductPlan = await client.addOrUpdate(payload);
     console.log(newCustomerProductPlan);
 }
 

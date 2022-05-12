@@ -1,5 +1,6 @@
 import { IValidatable, validators } from './validation';
 import { defaultProductId } from './constants';
+import { BillingPeriodInterval, PaymentStatus } from './payments';
 
 export class AllInvoicesQuery implements IValidatable {
     customerId: string;
@@ -58,22 +59,6 @@ enum InvoiceStatus {
     open = "open",
     gracePeriod = "grace_period",
     priceLocked = "price_locked",
-}
-
-enum PaymentStatus {
-    prePayment = "pre_payment",
-    requiresAction = "requires_action",
-    pending = "pending",
-    failed = "failed",
-    settled = "settled",
-    notNeeded = "not_needed",
-    unknown = "unknown",
-}
-
-enum BillingPeriodInterval {
-    day = "day",
-    month = "month",
-    year = "year",
 }
 
 class InvoiceKey {
