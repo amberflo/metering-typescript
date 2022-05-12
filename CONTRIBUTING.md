@@ -39,7 +39,7 @@ We follow [semantic versioning](https://semver.org/).
 
 Releasing a new version is mostly automated by a Github action. It does require a few manual steps:
 
-1. Bump the version number in `package.json`
+1. Bump the version number in `package.json` and in `src/model/constants.ts`
 2. Commit the change and give it a version tag:
 ```
 git commit -m "vX.Y.Z"
