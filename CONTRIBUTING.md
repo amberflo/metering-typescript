@@ -61,6 +61,8 @@ npm run check
 
 ## Releasing
 
+We follow [semantic versioning](https://semver.org/).
+
 Releasing a new version is mostly automated by a Github action. It does require a few manual steps:
 
 1. Bump the version number in `package.json`
@@ -69,7 +71,7 @@ Releasing a new version is mostly automated by a Github action. It does require 
 git commit -m "vX.Y.Z"
 git tag "vX.Y.Z"
 ```
-3. Create a release in in [Github](https://github.com/amberflo/metering-typescript/releases). Once you publish it, the Github action will publish the package to NPM.
+3. Push and then create a release in [Github](https://github.com/amberflo/metering-typescript/releases). Once you publish it, the Github action will publish the package to NPM.
 
 To build the release version:
 ```
