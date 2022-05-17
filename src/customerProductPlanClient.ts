@@ -13,7 +13,7 @@ export class CustomerProductPlanClient extends BaseClient {
      * Initialize a new `CustomerProductPlanClient`
      * `debug`: Whether to issue debug level logs or not.
      */
-    constructor(apiKey: string, debug = false, retry = false) {
+    constructor(apiKey: string, debug = false, retry = true) {
         super(apiKey, debug, 'CustomerProductPlanClient', retry);
     }
 
