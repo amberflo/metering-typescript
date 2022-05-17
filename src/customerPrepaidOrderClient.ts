@@ -17,9 +17,10 @@ export class CustomerPrepaidOrderClient extends BaseClient {
     /**
      * Initialize a new `CustomerPrepaidOrderClient`
      * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
      */
-    constructor(apiKey: string, debug = false) {
-        super(apiKey, debug, 'CustomerPrepaidOrderClient');
+    constructor(apiKey: string, debug = false, retry = true) {
+        super(apiKey, debug, 'CustomerPrepaidOrderClient', retry);
     }
 
     /**
