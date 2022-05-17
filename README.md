@@ -205,3 +205,13 @@ import {
     CustomerProductPlanApiPayload,
 } from "amberflo-metering-typescript";
 ```
+
+### Request Retry
+
+All clients accept a `retry` parameter to enable retrying idempotent requests
+on 5xx or network failures.  This uses the default configuration of
+[axios-retry](https://github.com/softonic/axios-retry).
+
+Further customization of retry logic is possible by manually patching the
+`client.axiosInstance` attribute of a client, as described in the
+[axios-retry](https://github.com/softonic/axios-retry) documentation.

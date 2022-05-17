@@ -11,9 +11,10 @@ export class CustomerDetailsClient extends BaseClient {
     /**
      * Initialize a new `CustomerDetailsClient`
      * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
      */
-    constructor(apiKey: string, debug = false) {
-        super(apiKey, debug, 'CustomerDetailsClient', true);
+    constructor(apiKey: string, debug = false, retry = true) {
+        super(apiKey, debug, 'CustomerDetailsClient', retry);
     }
 
     /**

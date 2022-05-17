@@ -17,10 +17,9 @@ export default class BaseClient {
 
     /**
      * Initialize a new `BaseClient`
-     * @param {string} apiKey
-     * @param {boolean} debug: Whether to issue debug level logs or not
-     * @param {string} name: Name of the client
-     * @param {boolean} retry: Whether to retry the requests or not (see https://github.com/softonic/axios-retry)
+     * `name`: Name of the client for logging purposes.
+     * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Wheter to retry idempotent requests on 5xx or network errors (see https://github.com/softonic/axios-retry)
      */
     constructor(apiKey: string, debug: boolean, name: string, retry = false) {
         this.signature = `[amberflo-metering ${name}]:`;

@@ -17,9 +17,10 @@ export class CustomerProductInvoiceClient extends BaseClient {
     /**
      * Initialize a new `CustomerProductInvoiceClient`
      * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
      */
-    constructor(apiKey: string, debug = false) {
-        super(apiKey, debug, 'UsageClient');
+    constructor(apiKey: string, debug = false, retry = false) {
+        super(apiKey, debug, 'CustomerProductInvoiceClient', retry);
     }
 
     /**

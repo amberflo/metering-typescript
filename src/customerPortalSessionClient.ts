@@ -12,9 +12,10 @@ export class CustomerPortalSessionClient extends BaseClient {
     /**
      * Initialize a new `CustomerPortalSessionClient`
      * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
      */
-    constructor(apiKey: string, debug = false) {
-        super(apiKey, debug, 'CustomerPortalSessionClient');
+    constructor(apiKey: string, debug = false, retry = false) {
+        super(apiKey, debug, 'CustomerPortalSessionClient', retry);
     }
 
     /**
