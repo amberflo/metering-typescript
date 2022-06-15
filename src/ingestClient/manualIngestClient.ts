@@ -21,7 +21,7 @@ export class ManualIngestClient implements IngestClient {
 
     start(): void {
         console.log(new Date(), this.signature, `start the client with debug ${this.debug} `);
-        this.apiClient = new IngestApiClient(this.apiKey);
+        this.apiClient = new IngestApiClient(this.apiKey, this.debug);
     }
 
     ingestMeter(meter: MeterMessage): void {

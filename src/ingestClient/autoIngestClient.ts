@@ -30,7 +30,7 @@ export class AutoIngestClient implements IngestClient {
     }
 
     public start(): void {
-        this.apiClient = new IngestApiClient(this.apiKey);
+        this.apiClient = new IngestApiClient(this.apiKey, this.debug);
         console.log(`${this.signature} start client with batch size: ${this.batchSize} frequency in ms ${this.frequencyMillis} debug ${this.debug}`);
         this.timer = setTimeout(this.dequeueTimer.bind(this), this.frequencyMillis);
     }
