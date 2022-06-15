@@ -72,7 +72,7 @@ export default class BaseClient {
         try {
             this.logDebug(action, params);
             const response = await this.axiosInstance.get<TResponse>(path, params ? { params } : undefined);
-            this.logInfo(action, response.status);
+            this.logDebug(action, response.status);
             return response.data;
         }
         catch (error) {
@@ -87,7 +87,7 @@ export default class BaseClient {
         try {
             this.logDebug(action, payload, params);
             const response = await this.axiosInstance.post<TResponse>(path, payload, params ? { params } : undefined);
-            this.logInfo(action, response.status);
+            this.logDebug(action, response.status);
             return response.data;
         }
         catch (error) {
@@ -102,7 +102,7 @@ export default class BaseClient {
         try {
             this.logDebug(action, payload);
             const response = await this.axiosInstance.put<TResponse>(path, payload);
-            this.logInfo(action, response.status);
+            this.logDebug(action, response.status);
             return response.data;
         }
         catch (error) {
