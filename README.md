@@ -11,7 +11,7 @@
 
 [Amberflo](https://amberflo.io) is the simplest way to integrate metering into your application.
 
-This is the official TypeScript client that wraps the [Amberflo REST API](https://docs.amberflo.io/docs).
+This is the official TypeScript (and JavaScript) client that wraps the [Amberflo REST API](https://docs.amberflo.io/docs).
 
 ## :heavy_check_mark: Features
 
@@ -104,6 +104,29 @@ const payload = new UsageApiPayload(
 );
 const result = await client.getUsage(payload);
 ```
+
+### With JavaScript
+
+This library can also be used directly with JavaScript. For instance:
+
+For instance, suppose you have the `index.js` bellow. You can run it with `node index.js`.
+```javascript
+'use strict';
+
+const apiKey = 'my-amberflo-api-key';
+
+const { CustomerDetailsClient } = require('amberflo-metering-typescript');
+
+async function main() {
+  const client = new CustomerDetailsClient(apiKey);
+  const customers = await client.list();
+  console.log(customers);
+}
+
+main();
+```
+
+Then you can run it with: `node index.js`.
 
 ## :zap: High throughput ingestion
 
