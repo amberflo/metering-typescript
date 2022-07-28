@@ -1,6 +1,6 @@
 export const amberfloBaseUrl = 'https://app.amberflo.io';
 
-const libVersion = "2.5.0";
+const libVersion = "2.5.1";
 
 export const userAgent = `Amberflo.io SDK ${libVersion}; Typescript; Node ${process.version}`;
 
