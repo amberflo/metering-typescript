@@ -58,9 +58,9 @@ describe('Metering tests', () => {
         const apiKey = 'my-key';
         const debug = false;
         const metering = new Metering(apiKey, debug);
-        expect(() => { metering.meter('', 0, 0, '') }).toThrowError(Errors.START_NOT_CALLED);
-        await expect(async () => { await metering.flush()}).rejects.toThrowError(Errors.START_NOT_CALLED);
-        await expect(async () => { await metering.shutdown()}).rejects.toThrowError(Errors.START_NOT_CALLED);
+        expect(() => { metering.meter('', 0, 0, '') }).toThrow(Errors.START_NOT_CALLED);
+        await expect(async () => { await metering.flush()}).rejects.toThrow(Errors.START_NOT_CALLED);
+        await expect(async () => { await metering.shutdown()}).rejects.toThrow(Errors.START_NOT_CALLED);
     });
     test('when ingesting meter then perform validations', () => {
         const apiKey = 'my-key';
@@ -72,8 +72,10 @@ describe('Metering tests', () => {
         const mockedStart = metering.ingestClient.start as jest.MockedFunction<() => void>;
 
         metering.start();
-        expect(mockedStart).toBeCalledTimes(1);
-        expect(() => { metering.meter('', 0, 0, '') }).toThrowError(errorMessage);
+        expect(mockedStart).toHaveBeenCalledTimes(1);
+        expect(() => { metering.meter('', 0, 0, '') }).toThrow(errorMessage);
+
+        metering.shutdown();
     });
     test('when ingesting meter then perform utcTimeMillis validations', () => {
         const metering = new Metering('my-key', false);
@@ -85,13 +87,15 @@ describe('Metering tests', () => {
 
         //millis less than 1
         const errorMessage = `Invalid meter message: ${Errors.INVALID_UTC_TIME_MILLIS}`;
-        expect(() => { metering.meter('my-meter', 0, 0, 'customer-id') }).toThrowError(errorMessage);
-        expect(mockedStart).toBeCalledTimes(1);
+        expect(() => { metering.meter('my-meter', 0, 0, 'customer-id') }).toThrow(errorMessage);
+        expect(mockedStart).toHaveBeenCalledTimes(1);
 
         //millis from a future date
         const futureDate = Date.now() + (30 * 24 * 12 * 60 * 60 * 1000);
         const errorMessage2 = `Invalid meter message: ${Errors.UTC_TIME_MILLIS_FROM_FUTURE}`;
-        expect(() => { metering.meter('my-meter', 0, futureDate, 'customer-id',) }).toThrowError(errorMessage2);
+        expect(() => { metering.meter('my-meter', 0, futureDate, 'customer-id',) }).toThrow(errorMessage2);
+
+        metering.shutdown();
     });
     test('when creating customer details then perform validations', async () => {
         const apiKey = 'my-key';
@@ -102,7 +106,7 @@ describe('Metering tests', () => {
         jest.spyOn(metering.ingestClient, 'start');
         const mockedStart = metering.ingestClient.start as jest.MockedFunction<() => void>;
 
-        expect(mockedStart).toBeCalledTimes(0);
-        await expect(async() => { await metering.addOrUpdateCustomerDetails('', '') }).rejects.toThrowError(errorMessage);
+        expect(mockedStart).toHaveBeenCalledTimes(0);
+        await expect(async() => { await metering.addOrUpdateCustomerDetails('', '') }).rejects.toThrow(errorMessage);
     });
 });
