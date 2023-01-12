@@ -1,3 +1,4 @@
+import { IAxiosRetryConfig } from "axios-retry";
 import BaseClient from "./baseClient";
 import { CustomerDetailsApiPayload, CustomerDetails } from './model/customerApiPayload';
 
@@ -11,9 +12,9 @@ export class CustomerDetailsClient extends BaseClient {
     /**
      * Initialize a new `CustomerDetailsClient`
      * `debug`: Whether to issue debug level logs or not.
-     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
+     * `retry`: Whether to retry idempotent requests on 5xx or network errors, or retry configuration (see https://github.com/softonic/axios-retry).
      */
-    constructor(apiKey: string, debug = false, retry = true) {
+    constructor(apiKey: string, debug = false, retry: boolean | IAxiosRetryConfig = true) {
         super(apiKey, debug, 'CustomerDetailsClient', retry);
     }
 

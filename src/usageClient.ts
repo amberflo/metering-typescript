@@ -1,3 +1,4 @@
+import { IAxiosRetryConfig } from "axios-retry";
 import BaseClient from "./baseClient";
 import { UsageApiPayload, AllUsageApiPayload, UsageReport } from "./model/usageApiPayload";
 
@@ -9,9 +10,9 @@ export class UsageClient extends BaseClient {
     /**
      * Initialize a new `UsageClient`
      * `debug`: Whether to issue debug level logs or not.
-     * `retry`: Wheter to retry idempotent requests on 5xx or network errors.
+     * `retry`: Whether to retry idempotent requests on 5xx or network errors, or retry configuration (see https://github.com/softonic/axios-retry).
      */
-    constructor(apiKey: string, debug = false, retry = true) {
+    constructor(apiKey: string, debug = false, retry: boolean | IAxiosRetryConfig = true) {
         super(apiKey, debug, 'UsageClient', retry);
     }
 

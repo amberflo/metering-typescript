@@ -1,11 +1,21 @@
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
+import { IAxiosRetryConfig, isNetworkError } from "axios-retry";
 import BaseClient from "../baseClient";
+import { ingestBaseUrl } from "../model/constants";
 import { MeterMessage } from '../model/meterMessage';
 
 export class IngestApiClient extends BaseClient {
 
-    constructor(apiKey: string, debug = false, retry = true) {
-        super(apiKey, debug, 'IngestApiClient', retry);
+    private readonly path = '/ingest';
+
+    /**
+     * Initialize a new `IngestApiClient`
+     * `debug`: Whether to issue debug level logs or not.
+     * `retry`: Whether to retry on 429, 5xx, or network errors, or retry configuration (see https://github.com/softonic/axios-retry).
+     */
+    constructor(apiKey: string, debug = false, retry: boolean | IAxiosRetryConfig = {}) {
+        super(apiKey, debug, 'IngestApiClient', toRetryOptions(retry));
+        this.axiosInstance.defaults.baseURL = ingestBaseUrl;
     }
 
     private logResponse<T>(response: AxiosResponse<T>, requestId: string) {
@@ -19,7 +29,7 @@ export class IngestApiClient extends BaseClient {
     post(payload: Array<MeterMessage>, requestId: string, done?: () => void) {
         this.logDebug('about to post meters:', requestId);
         return this.axiosInstance
-            .post('/ingest', payload)
+            .post(this.path, payload)
             .then((response) => {
                 this.logResponse(response, requestId);
                 if (done) {
@@ -37,11 +47,46 @@ export class IngestApiClient extends BaseClient {
     async postSync(payload: Array<MeterMessage>, requestId: string) {
         this.logDebug('about to post meters:', requestId);
         try {
-            const response = await this.axiosInstance.post<string>('/ingest', payload);
+            const response = await this.axiosInstance.post<string>(this.path, payload);
             this.logResponse(response, requestId);
             return response;
         } catch(error) {
             this.logError('request failed:', requestId, error);
         }
     }
+}
+
+const defaultRetryOptions = {
+    retryDelay,
+    retryCondition,
+};
+
+function toRetryOptions(retry: boolean | IAxiosRetryConfig): boolean | IAxiosRetryConfig {
+    if (!retry) return false;
+
+    if (retry === true) {
+        return defaultRetryOptions;
+    }
+
+    return {
+        ...defaultRetryOptions,
+        ...retry,
+    };
+}
+
+const retryDelays = [2, 6, 12, 20, 40, 80];
+
+function retryDelay(retryNumber = 0) {
+    const delay = retryNumber >= retryDelays.length
+        ? 80
+        : retryDelays[retryNumber];
+
+    return delay * Math.random();  // full jitter
+}
+
+function retryCondition(error: AxiosError) {
+    const status = error.response?.status;
+    return status
+        ? (status === 429 || status >= 500)
+        : isNetworkError(error);
 }
