@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import axiosRetry from 'axios-retry';
+import axiosRetry, { IAxiosRetryConfig } from 'axios-retry';
 import { amberfloBaseUrl, userAgent } from './model/constants';
 
 export default class BaseClient {
@@ -19,9 +19,14 @@ export default class BaseClient {
      * Initialize a new `BaseClient`
      * `name`: Name of the client for logging purposes.
      * `debug`: Whether to issue debug level logs or not.
-     * `retry`: Wheter to retry idempotent requests on 5xx or network errors (see https://github.com/softonic/axios-retry)
+     * `retry`: Whether to retry idempotent requests on 5xx or network errors, or retry configuration (see https://github.com/softonic/axios-retry).
      */
-    constructor(apiKey: string, debug: boolean, name: string, retry = true) {
+    constructor(
+        apiKey: string,
+        debug: boolean,
+        name: string,
+        retry: boolean | IAxiosRetryConfig = true,
+    ) {
         this.signature = `[amberflo-metering ${name}]:`;
         this.apiKey = apiKey;
         this.debug = debug;
@@ -39,7 +44,8 @@ export default class BaseClient {
         if (retry) {
             axiosRetry(this.axiosInstance, {
                 retries: 3,
-                retryDelay: axiosRetry.exponentialDelay
+                retryDelay: axiosRetry.exponentialDelay,
+                ...toRetryOptions(retry),
             });
         }
     }
@@ -110,4 +116,9 @@ export default class BaseClient {
             throw new Error(`${action} failed: ${error}`);
         }
     }
+}
+
+function toRetryOptions(retry: boolean | IAxiosRetryConfig): IAxiosRetryConfig {
+    if (typeof retry === 'boolean') return {};
+    return retry;
 }
