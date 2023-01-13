@@ -57,6 +57,7 @@ export class IngestApiClient extends BaseClient {
 }
 
 const defaultRetryOptions = {
+    retries: 6,
     retryDelay,
     retryCondition,
 };
