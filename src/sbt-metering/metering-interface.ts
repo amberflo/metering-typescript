@@ -37,22 +37,22 @@ export interface IMetering {
    * The function to trigger to create a meter.
    * Once created, the meter can be used to track and analyze the specific usage metrics for tenants.
    */
-  createMeter?: IFunction | IFunctionTrigger;
+  createMeterFunction?: IFunction | IFunctionTrigger;
 
   /**
    * The function to trigger to ingest a usage event.
    * Usage events are used to measure and track the usage metrics associated with the meter.
    */
-  ingest: IFunction | IFunctionTrigger;
+  ingestFunction: IFunction | IFunctionTrigger;
 
   /**
    * The function to trigger to get the usage data that has been recorded for a specific meter.
    */
-  getUsage: IFunction | IFunctionTrigger;
+  getUsageFunction: IFunction | IFunctionTrigger;
 
   /**
    * The function to trigger to exclude specific events from being recorded or included in the usage data.
    * Used for canceling events that were incorrectly ingested.
    */
-  cancelUsageEvents?: IFunction | IFunctionTrigger;
+  cancelUsageEventsFunction?: IFunction | IFunctionTrigger;
 }
